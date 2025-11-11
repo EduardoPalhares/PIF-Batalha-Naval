@@ -6,9 +6,9 @@ Projeto de implementação do clássico jogo Batalha Naval, desenvolvido inteira
 
 ## 🎯 Contexto do Projeto
 
-[cite_start]Este é o projeto final da disciplina de **Programação Imperativa e Funcional (PIFSI 2025.2)** do curso de Sistemas de Informação da **CESAR School**.
+Este é o projeto final da disciplina de **Programação Imperativa e Funcional (PIFSI 2025.2)** do curso de Sistemas de Informação da **CESAR School**.
 
-[cite_start]O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendidos em sala de aula, demonstrando o domínio de `Structs`, Ponteiros, Alocação Dinâmica de Memória (`malloc` e `realloc`) e os fluxos básicos de controle.
+O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendidos em sala de aula, demonstrando o domínio de `Structs`, Ponteiros, Alocação Dinâmica de Memória (`malloc` e `realloc`) e os fluxos básicos de controle.
 
 ## 👥 Equipe
 
@@ -24,4 +24,4 @@ Projeto de implementação do clássico jogo Batalha Naval, desenvolvido inteira
 
 ## 📐 Decisões de Design
 
-[cite_start]*(Esta seção será preenchida durante o desenvolvimento para documentar nossas escolhas, conforme solicitado no relatório técnico )*
+*(Esta seção será preenchida durante o desenvolvimento para documentar nossas escolhas, conforme solicitado no relatório técnico )*

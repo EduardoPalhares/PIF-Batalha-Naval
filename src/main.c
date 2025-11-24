@@ -1,3 +1,5 @@
+//Ponto de partida do programa
+
 #include <stdio.h>
 #include "../include/cell_state.h"
 #include "../include/orientation.h"

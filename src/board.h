@@ -1,3 +1,5 @@
+//Tabuleiro (onde ficam as células e os navios)
+
 #ifndef BOARD_H
 #define BOARD_H
 

@@ -1,3 +1,5 @@
+//Frota de navios (definição, posicionamento, status)
+
 #ifndef FLEET_H
 #define FLEET_H
 

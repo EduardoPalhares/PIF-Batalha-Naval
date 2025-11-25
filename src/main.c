@@ -1,8 +1,8 @@
 //Ponto de partida do programa
 
 #include <stdio.h>
-#include "../include/cell_state.h"
-#include "../include/orientation.h"
+#include "cell_state.h"
+#include "orientation.h"
 
 int main() {
     enum CellState estado = CELL_SHIP;

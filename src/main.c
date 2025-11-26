@@ -8,36 +8,37 @@ int main() {
 
     // 1. TESTE DE CRIAÇÃO
     printf("[1] Criando tabuleiro 10x10...\n");
-    Board tabuleiro = board_create(10, 10);
+    Board tabuleiro = board_create(10, 10);                          // Chama a função que aloca dinamicamente o array de células.
     
     // 2. TESTE DE ACESSO E ALTERAÇÃO
     printf("[2] Colocando navios manualmente...\n");
     
     // Coloca um navio em B5 (Linha 1, Coluna 4)
-    Cell *c1 = board_get_cell(&tabuleiro, 1, 4); 
-    if (c1) c1->state = CELL_SHIP;
+    Cell *c1 = board_get_cell(&tabuleiro, 1, 4);                    // Linha 1 corresponde à Linha 2 do usuário; Coluna 4 corresponde à coluna 'E' (0=A).
+    if (c1) c1->state = CELL_SHIP;                                  // Verifica se o ponteiro é válido antes de acessar a memória.
 
     // Coloca um tiro (HIT) em J10 (Linha 9, Coluna 9)
     Cell *c2 = board_get_cell(&tabuleiro, 9, 9);
-    if (c2) c2->state = CELL_HIT;
+    if (c2) c2->state = CELL_HIT;                                   // Acessa o membro 'state' e simula um acerto.
 
     // Tenta acessar fora do tabuleiro (Erro proposital)
     Cell *c_erro = board_get_cell(&tabuleiro, 20, 20);
-    if (c_erro == NULL) {
+    if (c_erro == NULL) {                                         // Verifica se a função board_get_cell retornou NULL, indicando que o acesso foi bloqueado.
         printf("    (Sucesso: O sistema bloqueou acesso fora do tabuleiro)\n");
     }
 
     // 3. TESTE DE EXIBIÇÃO
     printf("\n[3] Visão do Jogador (Vê navios):\n");
-    board_display(&tabuleiro, 1);
+    board_display(&tabuleiro, 1);                               // O argumento '1' indica que os navios (CELL_SHIP) devem ser visíveis ('S').
 
     printf("\n[3] Visão do Inimigo (Navios ocultos):\n");
-    board_display(&tabuleiro, 0);
+    board_display(&tabuleiro, 0);                               // O argumento '0' indica que os navios (CELL_SHIP) devem ser ocultados ('~').
 
     // 4. TESTE DE MEMÓRIA
     printf("\n[4] Liberando memória...\n");
-    board_destroy(&tabuleiro);
+    board_destroy(&tabuleiro);                                  // Chama a função que usa 'free()' para liberar o array de células alocadas.
     printf("    Memória liberada com sucesso.\n");
 
     return 0;
 }
+

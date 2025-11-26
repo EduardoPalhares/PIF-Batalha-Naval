@@ -5,23 +5,24 @@
 
 #include <stdio.h>
 
-
 typedef enum{
-    CELL_WATER,
-    CELL_SHIP,
-    CELL_HIT,
-    CELL_MISS
+    CELL_WATER,                       // 0: Célula vazia (Água)
+    CELL_SHIP,                        // 1: Célula ocupada por um navio (não atingido)
+    CELL_HIT,                         // 2: Célula que tinha navio e foi atingida (Acerto)
+    CELL_MISS                         // 3: Célula que era água e foi atingida (Água)
 }CellState;
 
+// Representa uma única posição do tabuleiro (o menor elemento estrutural).
 typedef struct {
-    CellState state;
-    int ship_id; // -1 se não houver navio
+    CellState state;               // Estado atual da célula (água, navio, acerto, erro)
+    int ship_id;                   // -1 se não houver navio
 } Cell;
 
+Representa o tabuleiro completo.
 typedef struct {
-    int rows;
-    int cols;
-    Cell *cells; //para poder usar o malloc(row * col)
+    int rows;                      // Número de linhas (tamanho)
+    int cols;                      // Número de colunas (tamanho)
+    Cell *cells;                   //para poder usar o malloc(row * col)
 } Board;
 
 // Cria um tabuleiro inicializado com ÁGUA
@@ -36,3 +37,4 @@ Cell* board_get_cell(Board *board, int row, int col);
 void board_display(Board *board, int show_ships);
 
 #endif //BOARD_H
+

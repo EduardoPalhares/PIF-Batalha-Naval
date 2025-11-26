@@ -50,8 +50,8 @@ Cell* board_get_cell(Board *board, int row, int col){
 // show_ships: 1 para mostrar os navios (jogador vendo seu próprio mapa)
 // show_ships: 0 para esconder os navios (jogador vendo o mapa do inimigo)
 void board_display(Board *board,int show_ships){
+    // Imprime o cabeçalho das colunas (A, B, C, ...)
     printf("  ");                     //Espaço para alinhar com os números das linhas
-
     for (int j=0;j< board->cols;j++){
         printf("%c ", 'A'+j);
     }

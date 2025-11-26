@@ -75,11 +75,11 @@ void board_display(Board *board,int show_ships){
                 break;
 
                 case CELL_HIT:
-                    simbolo = 'X'; // Navio atingido
+                    simbolo = 'X';                               // Navio atingido
                     break;
 
                 case CELL_MISS:
-                    simbolo = '.'; // Tiro na água
+                    simbolo = '.';                               // Tiro na água
                     break;
             }
              printf("%c ", simbolo);

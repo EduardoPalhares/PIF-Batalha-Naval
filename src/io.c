@@ -18,11 +18,11 @@ bool io_converter_coord(const char *input, int *row, int *col){
         return false;
     }
 
-    *row=letra - 'A';
+    *col=letra - 'A';
 
     int numero =atoi(&input[1]);
 
-    *col=numero-1;
+    *row=numero-1;
 
     return true;
 }

@@ -71,8 +71,7 @@ void board_display(Board *board,int show_ships){
                 break;
 
                 case CELL_SHIP:
-                // Se show_ships for 1 (verdadeiro), mostra 'S'. Senão, esconde como água '~'.
-                simbolo=(show_ships) ? 'S' : '~';
+                simbolo=(show_ships) ? 'S' : '~';                // Se show_ships for 1 (verdadeiro), mostra 'S'. Senão, esconde como água '~'.
                 break;
 
                 case CELL_HIT:

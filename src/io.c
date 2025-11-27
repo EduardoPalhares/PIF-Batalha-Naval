@@ -96,3 +96,14 @@ bool io_get_settings(int *board_size, char *placement_mode) {
     } while (1);                                                            // Loop infinito até que o break seja alcançado.
     return true;                                                           // Retorna sucesso na leitura de configurações.
 }
+
+void io_get_player_names(char *p1_nickname, char *p2_nickname) {                            //Objetivo: Solicitar e armazenar o nome dos dois jogadores.
+    printf("\n=== REGISTRO DE JOGADORES ===\n");
+    printf("Nome do Jogador 1 (no máximo 31 caracteres): ");                            // 1. Leitura do Nome do Jogador 1
+    fgets(p1_nickname, 32, stdin);
+    p1_nickname[strcspn(p1_nickname, "\n")] = '\0';                                 // Usamos strcspn para encontrar a posição do '\n' e substituí-lo por '\0' (terminador de string).
+    printf("Nome do Jogador 2 (no máximo 31 caracteres): ");                           // 2. Leitura do Nome do Jogador 2
+    fgets(p2_nickname, 32, stdin);                 
+    p2_nickname[strcspn(p2_nickname, "\n")] = '\0';
+    printf("Nomes registrados!\n");
+}

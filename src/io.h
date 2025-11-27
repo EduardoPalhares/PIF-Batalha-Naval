@@ -13,4 +13,6 @@ bool io_get_settings(int *board_size, char *placement_mode);          //Usa pont
 
 void io_get_player_names(char *p1_nickname, char *p2_nickname);             // Solicita e armazena os nomes dos jogadores nos arrays fornecidos (passados por ponteiro).
 
+bool io_get_shot_coord(int max_size, int *row, int *col);                // Lê e valida a coordenada de tiro, garantindo que esteja dentro dos limites.
+
 #endif

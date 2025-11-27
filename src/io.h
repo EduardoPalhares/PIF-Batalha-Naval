@@ -9,4 +9,6 @@ bool io_converter_coord(const char *input, int *row,int *col);               //c
 
 int io_show_main_menu();                                  // Exibe o menu principal e retorna a opção escolhida.
 
+bool io_get_settings(int *board_size, char *placement_mode);          //Usa ponteiros para retornar os valores lidos.
+
 #endif

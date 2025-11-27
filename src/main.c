@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include "board.h"
+#include "io.h"
 
 int main() {
     printf("=== TESTE DA FASE 3: BOARD E MALLOC ===\n\n");
@@ -29,16 +30,34 @@ int main() {
 
     // 3. TESTE DE EXIBIÇÃO
     printf("\n[3] Visão do Jogador (Vê navios):\n");
-    board_display(&tabuleiro, 1);                               // O argumento '1' indica que os navios (CELL_SHIP) devem ser visíveis ('S').
+    board_display(&tabuleiro, 1);                           // O argumento '1' indica que os navios (CELL_SHIP) devem ser visíveis ('S').
 
     printf("\n[3] Visão do Inimigo (Navios ocultos):\n");
-    board_display(&tabuleiro, 0);                               // O argumento '0' indica que os navios (CELL_SHIP) devem ser ocultados ('~').
+    board_display(&tabuleiro, 0);                               //O argumento '0' indica que os navios (CELL_SHIP) devem ser ocultados ('~').
 
     // 4. TESTE DE MEMÓRIA
     printf("\n[4] Liberando memória...\n");
-    board_destroy(&tabuleiro);                                  // Chama a função que usa 'free()' para liberar o array de células alocadas.
+    board_destroy(&tabuleiro);                                  //Chama a função que usa 'free()' para liberar o array de células alocadas.
     printf("    Memória liberada com sucesso.\n");
 
+    int escolha = io_show_main_menu();
+
+    // Lógica de controle com base na escolha
+    switch (escolha) {
+        case 1:
+            printf("Iniciando Novo Jogo...\n");
+            // Chamada futura: game_initialize();
+            break;
+        case 2:
+            printf("Acessando Configuracoes...\n");
+            // Chamada futura: io_show_config_menu();
+            break;
+        case 3:
+            printf("Saindo do jogo. Ate mais!\n");
+            break;
+    }
+  
     return 0;
 }
+
 

@@ -11,4 +11,6 @@ int io_show_main_menu();                                  // Exibe o menu princi
 
 bool io_get_settings(int *board_size, char *placement_mode);          //Usa ponteiros para retornar os valores lidos.
 
+void io_get_player_names(char *p1_nickname, char *p2_nickname);             // Solicita e armazena os nomes dos jogadores nos arrays fornecidos (passados por ponteiro).
+
 #endif

@@ -54,3 +54,45 @@ int io_show_main_menu() {                                  //Exibir o menu inici
     } while (opcao < 1 || opcao > 3); // O loop continua enquanto a opção for inválida.
     return opcao;
 }
+
+
+//Limpa o buffer de entrada para evitar que caracteres residuais interfiram 
+static void clear_input_buffer() {
+    int c;
+    // Descarta todos os caracteres até encontrar uma quebra de linha ('\n') ou o fim do arquivo (EOF).
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+
+//Lidar com as configurações iniciais (tamanho do tabuleiro e modo).
+bool io_get_settings(int *board_size, char *placement_mode) {
+    int size = 0;
+    char mode;
+    do {                                // 1. LEITURA E VALIDAÇÃO DO TAMANHO DO TABULEIRO
+        printf("\nTamanho do tabuleiro (6-26): ");
+        if (scanf("%d", &size) != 1) {                              //Tenta ler um inteiro. Se falhar (retornar 0), a entrada não foi numérica.
+            printf("Entrada invalida. Digite um numero.\n");
+            clear_input_buffer();                                   // Limpa o buffer para a próxima tentativa.
+            size = 0;                                       //força a continuação do loop.
+            continue;}
+        clear_input_buffer();                                // Limpa o buffer após uma leitura bem-sucedida de um número.
+        if (size < 6 || size > 26) {                                 // Validação de Limites (6 a 26)
+            printf("Tamanho invalido. Escolha um valor entre 6 e 26.\n"); }
+    } while (size < 6 || size > 26);
+    *board_size = size;                             // Armazena o tamanho validado no endereço de memória apontado por *board_size.
+    do {                                           // 2. LEITURA E VALIDAÇÃO DO MODO DE POSICIONAMENTO
+        printf("Posicionamento manual ou automatico? Digite 'M' ou 'A'. > ");
+        if (scanf(" %c", &mode) != 1) {                                   // O espaço antes do %c ignora qualquer caractere de espaço em branco anterior (como \n).
+            printf("Modo invalido. Digite 'M' ou 'A'.\n");
+            clear_input_buffer();
+            continue;}
+        clear_input_buffer();                             // Limpeza do buffer após a leitura do caractere (para o caso de entrada como "M resto").
+        mode = toupper(mode);                                       // Converte o caractere para maiúsculo para aceitar 'm' ou 'a'.
+        if (mode == 'M' || mode == 'A') {                            // Validação de Opção ('M' ou 'A')
+            *placement_mode = mode;                                         // Armazena o modo validado no endereço de memória apontado por *placement_mode.
+            break;} 
+            else { 
+            printf("Modo invalido. Digite 'M' para Manual ou 'A' para Automatico.\n");}
+    } while (1);                                                            // Loop infinito até que o break seja alcançado.
+    return true;                                                           // Retorna sucesso na leitura de configurações.
+}

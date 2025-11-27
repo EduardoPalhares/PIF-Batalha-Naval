@@ -18,7 +18,7 @@ typedef struct {
     int ship_id;                   // -1 se não houver navio
 } Cell;
 
-Representa o tabuleiro completo.
+//Representa o tabuleiro completo.
 typedef struct {
     int rows;                      // Número de linhas (tamanho)
     int cols;                      // Número de colunas (tamanho)
@@ -34,6 +34,7 @@ void board_destroy(Board *board);
 // Retorna um ponteiro para a célula na posição (row, col) ou NULL se inválido
 Cell* board_get_cell(Board *board, int row, int col);
 
+//Exibe o estado atualizado do tabuleiro no terminal
 void board_display(Board *board, int show_ships);
 
 #endif //BOARD_H

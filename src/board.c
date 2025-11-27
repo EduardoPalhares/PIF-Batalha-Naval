@@ -46,7 +46,7 @@ Cell* board_get_cell(Board *board, int row, int col){
 }
 
 
-// Exibe o estado atual dp tabuleiro no terminal
+// Exibe o estado atual do tabuleiro no terminal
 // show_ships: 1 para mostrar os navios (jogador vendo seu próprio mapa)
 // show_ships: 0 para esconder os navios (jogador vendo o mapa do inimigo)
 void board_display(Board *board,int show_ships){
@@ -64,25 +64,21 @@ void board_display(Board *board,int show_ships){
             Cell *cell=board_get_cell(board,i,j);           //Obtém o ponteiro para a célula atual, usando a função auxiliar.
 
             char simbolo='?';                   //Variável para armazenar o símbolo a ser impresso.
-
             switch (cell->state){               //Estrutura de controle 'switch' para determinar o símbolo com base no estado da célula.
                 case CELL_WATER:
                 simbolo='~';
                 break;
-
                 case CELL_SHIP:
                 simbolo=(show_ships) ? 'S' : '~';                // Se show_ships for 1 (verdadeiro), mostra 'S'. Senão, esconde como água '~'.
                 break;
-
                 case CELL_HIT:
                     simbolo = 'X';                               // Navio atingido
                     break;
-
                 case CELL_MISS:
                     simbolo = '.';                               // Tiro na água
                     break;
             }
-             printf("%c ", simbolo);
+             printf("%c ", simbolo);//Mostra o simbolo
         }
             printf("\n");//pula para próxima linha
     }

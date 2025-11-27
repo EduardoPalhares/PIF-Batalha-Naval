@@ -8,13 +8,13 @@
 
 bool io_converter_coord(const char *input, int *row, int *col){
     
-    if(input==NULL || strlen(input)<2){                       // Validação inicial do ponteiro e do comprimento da string.
+    if(input==NULL || strlen(input)<2){    // Validação inicial do ponteiro e do comprimento da string.
         return false;
     }
 
-    char letra=toupper(input[0]);                             // Pega o primeiro caractere (a letra) e o converte para maiúsculo.
+    char letra=toupper(input[0]);      // Pega o primeiro caractere (a letra) e o converte para maiúsculo.
 
-    if (letra<'A' || letra >'Z'){                             // Validação da Coluna: Garante que o primeiro caractere é uma letra válida (A-Z).
+    if (letra<'A' || letra >'Z'){     // Validação da Coluna: Garante que o primeiro caractere é uma letra válida (A-Z).
         return false;
     }
 

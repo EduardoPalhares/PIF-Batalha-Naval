@@ -32,3 +32,25 @@ bool io_converter_coord(const char *input, int *row, int *col){
 
     return true;                                              // A conversão da estrutura da string para números foi bem-sucedida.
 }
+
+int io_show_main_menu() {                                  //Exibir o menu inicial e ler/validar a opção do usuário.
+    int opcao;
+    do {                                                    // Loop de leitura: repete até que uma opção válida (1, 2 ou 3) seja inserida.
+        printf("\n=== BATALHA NAVAL ===\n");
+        printf("1) Novo jogo\n");
+        printf("2) Configuracoes\n");
+        printf("3) Sair\n");
+        printf("> ");
+        if (scanf("%d", &opcao) != 1) {                               // Tenta ler a opção. Se o scanf retornar 0, a entrada não foi um número.
+            printf("\nOpcao invalida. Digite um numero (1, 2 ou 3).\n");
+            int c;                                        // Limpa o buffer de entrada (stdin) para descartar caracteres inválidos (letras, etc.)
+            while ((c = getchar()) != '\n' && c != EOF);
+            opcao = 0; // Força o loop a continuar
+            continue;
+        }
+        if (opcao < 1 || opcao > 3) {                                                   // Validação de intervalo
+            printf("\nOpcao invalida. Escolha 1, 2 ou 3.\n");
+        }
+    } while (opcao < 1 || opcao > 3); // O loop continua enquanto a opção for inválida.
+    return opcao;
+}

@@ -3,6 +3,7 @@
 #ifndef IO_H
 #define IO_H
 
+#include "board.h"
 #include <stdbool.h>
 
 bool io_converter_coord(const char *input, int *row,int *col);               //conversão de string para número
@@ -14,5 +15,7 @@ bool io_get_settings(int *board_size, char *placement_mode);          //Usa pont
 void io_get_player_names(char *p1_nickname, char *p2_nickname);             // Solicita e armazena os nomes dos jogadores nos arrays fornecidos (passados por ponteiro).
 
 bool io_get_shot_coord(int max_size, int *row, int *col);                // Lê e valida a coordenada de tiro, garantindo que esteja dentro dos limites.
+
+void io_show_shot_result(CellState result, const char *ship_name, bool is_sunk);               // Exibe o resultado de um tiro com base no estado da célula e no status do navio.
 
 #endif

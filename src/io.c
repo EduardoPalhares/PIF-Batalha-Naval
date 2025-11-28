@@ -107,3 +107,29 @@ void io_get_player_names(char *p1_nickname, char *p2_nickname) {                
     p2_nickname[strcspn(p2_nickname, "\n")] = '\0';
     printf("Nomes registrados!\n");
 }
+
+//Ler a coordenada do tiro, validar formato e limites do tabuleiro.
+bool io_get_shot_coord(int max_size, int *row, int *col) {
+    char input[10]; // Buffer para ler a coordenada (ex: A10, B5)
+    int temp_row = -1, temp_col = -1;
+    bool valid_input = false;
+    do {                        // Loop de validação: Repete até obter uma coordenada válida nos limites do tabuleiro.
+        printf("Digite coordenada do tiro (ex.: E5): ");
+        if (fgets(input, sizeof(input), stdin) == NULL){                           // Uso de fgets para ler a coordenada de forma segura.
+            return false;                   // Erro de leitura.
+        }
+        input[strcspn(input, "\n")] = '\0';                              // Limpa o caractere '\n' inserido pelo fgets.
+        if (!io_converter_coord(input, &temp_row, &temp_col)) {                      // Tenta converter a string (ex: "B5") para índices numéricos (temp_row, temp_col).
+            printf("Coordenada invalida. Formato incorreto (esperado LetraNumero, ex: A1).\n");
+            continue; // Tenta novamente.
+        }
+        if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {                    // Verifica se os índices convertidos estão dentro dos limites do tabuleiro.
+            printf("Coordenada fora dos limites do tabuleiro (%c1 a %c%d).\n", 'A', 'A' + max_size - 1, max_size);
+            continue;                     // Tenta novamente.
+        }
+        valid_input = true;                                        // Se chegou até aqui, a coordenada é válida.
+    } while (!valid_input);
+    *row = temp_row;                            // Armazena os índices validados nos ponteiros de retorno.
+    *col = temp_col;
+    return true;
+}

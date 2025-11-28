@@ -155,3 +155,29 @@ void io_show_shot_result(CellState result, const char *ship_name, bool is_sunk) 
             break;
     }
 }
+
+
+//Calcula a precisão e imprime o bloco de estatísticas para um jogador.
+static void print_player_stats(const Player *p) {
+    // Usando valores simulados para a demonstração, até que você implemente o rastreamento:
+    int total_shots = 31;       
+    int hits = 17;        
+    
+    double accuracy = 0.0;
+    
+    if (total_shots > 0) {                                             // Cálculo da precisão: (acertos / tiros) * 100.0. Não requer math.h.
+        accuracy = ((double)hits / total_shots) * 100.0;
+    }
+    printf("Estatisticas de %s:\n", p->nickname);
+    printf("Tiros: %d | Acertos: %d | Precisao: %.1f%%\n", total_shots, hits, accuracy);
+}
+
+//Exibir o vencedor e as estatísticas.
+void io_show_winner_stats(const Player *winner, const Player *loser) {
+    printf("\n*** FIM DE JOGO ***\n");
+    printf("Vencedor: %s\n", winner->nickname);                   // Exibe o vencedor, acessando diretamente o campo 'nickname'.
+    printf("\n--- Estatisticas do Vencedor ---\n");                         // Imprime as estatísticas do Vencedor.
+    print_player_stats(winner);
+    printf("\n--- Estatisticas do Perdedor ---\n");                             // Imprime as estatísticas do Perdedor.
+    print_player_stats(loser);
+}

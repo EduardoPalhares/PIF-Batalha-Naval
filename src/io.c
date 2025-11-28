@@ -133,3 +133,26 @@ bool io_get_shot_coord(int max_size, int *row, int *col) {
     *col = temp_col;
     return true;
 }
+
+
+//Exibir o resultado do tiro para o usuário (ÁGUA, ACERTOU, AFUNDOU).
+void io_show_shot_result(CellState result, const char *ship_name, bool is_sunk) {
+    printf("Resultado: ");
+    switch (result) {                                   // Usa a estrutura switch para determinar o resultado principal com base no CellState.
+        case CELL_WATER:
+        case CELL_MISS:
+            printf("AGUA.\n");                                 // O estado CELL_WATER e CELL_MISS (tiro na água) resultam em "ÁGUA".
+            break;
+        case CELL_SHIP:
+            // ou como o estado 'anterior' ao HIT, dependendo da lógica do jogo.
+            printf("ERRO DE LOGICA: Estado do navio inesperado.\n");                      // Tecnicamente, a célula não deveria estar em CELL_SHIP após o tiro, mas tratamos como erro ou como o estado 'anterior' ao HIT, dependendo da lógica do jogo.
+            break;
+        case CELL_HIT:
+            if (is_sunk) {                                       // Se foi um acerto (CELL_HIT), precisamos saber se este acerto afundou o navio.
+                printf("AFUNDOU %s!\n", ship_name);                                        // Se a flag is_sunk for true (verdadeira), o navio afundou.
+            } else {
+                printf("ACERTOU no %s!\n", ship_name);                                         // Se a flag for false, foi apenas um acerto.
+            }
+            break;
+    }
+}

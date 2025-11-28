@@ -6,10 +6,10 @@
 
 //Função privada usada para criação de frota padrão(Função privada)
 static void setup_ship(Ship *s, const char *name, int length){
-    strcpy(s->name, name);
-    s->length=length;
-    s->hits=0;
-    s->placed=0;
+    strcpy(s->name, name);// leva 
+    s->length=length; // Comprimento do navio com quantas celúlas ele tem
+    s->hits=0; // Inicializa o contador de acertos com 0 (navio novo, sem dano)
+    s->placed=0; // Navio está na memória
 }
 
 
@@ -45,3 +45,51 @@ void fleet_destroy(Fleet *fleet) {
     }
 }
 
+//Verifica se é possível colocar o navio no board(sem gravar)
+//Retorna 1 se for possível,0 se inválido (fora do mapa ou colisão)
+int fleet_check_placement(Board *board, Ship *ship, int row, int col, Orientation orient) {
+    // Verificação limites do tabuleiro
+    if (orient == ORIENT_H) {
+        //Se for horizontal, col + tamanho deve ser <= total de colunas
+        if (col + ship->length > board->cols) return 0; // Sai do mapa à direita
+    } else {
+        //Se for vertical, row + tamanho deve ser <= total de linhas
+        if (row + ship->length > board->rows) return 0; // Sai do mapa para baixo
+    }
+    //Verificar Colisão (Se já tem navio no caminho)
+    for (int i = 0; i < ship->length; i++) {
+        int r = row;
+        int c = col;
+        if (orient == ORIENT_H) {
+            c += i; // Avança nas colunas
+        } else {
+            r += i; // Avança nas linhas
+        }
+        Cell *cell = board_get_cell(board, r, c); // Pega a célula naquela posição
+        // Se a célula não for ÁGUA, já tem algo lá (colisão)
+        if (cell->state != CELL_WATER) {
+            return 0; 
+        }
+    }
+    return 1;
+}
+
+//Grava o navio no tabuleiro
+void fleet_place_ship(Board *board, Ship *ship, int ship_id, int row, int col, Orientation orient) {
+    for (int i = 0; i < ship->length; i++) {
+        int r = row;
+        int c = col;
+
+        if (orient == ORIENT_H) c += i;
+        else r += i;
+
+        Cell *cell = board_get_cell(board, r, c);
+        
+        // Atualiza o estado da célula
+        cell->state = CELL_SHIP;
+        cell->ship_id;  // Ex: 'A' - 'A' = 0; 'B' - 'A' = 1.d = ship_id;
+    }
+
+    ship->placed = 1;      // Marca o navio como posicionado na struct dele
+
+}

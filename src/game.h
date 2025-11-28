@@ -5,6 +5,14 @@
 #include "board.h"
 #include "fleet.h"
 
+typedef enum {
+    SHOT_MISS,      // Errou (Água)
+    SHOT_HIT,       // Acertou uma parte do navio
+    SHOT_SUNK,      // Afundou o navio todo!
+    SHOT_REPEATED,  // Já tinha atirado aqui antes
+    SHOT_INVALID    // Coordenada inválida
+} ShotResult;
+
 // Representa um jogador individual e seu estado no jogo.
 typedef struct {
     Board board;                          // O tabuleiro onde estão posicionados OS SEUS navios
@@ -21,5 +29,24 @@ typedef struct{
     int game_over;                        // Flag (0 ou 1) que indica se o jogo terminou.O jogo termina quando a frota de um jogador é afundada
 }Game;
 
+//inicializa o jogo: cria tabuleiros (com tamanho rows x cols) e frotas para ambos
+Game game_init(int rows,int cols);
 
-#endif
+//Libera toda memŕoa alocada no jogo (tabuleiros e frotas)
+void game_destroy(Game *game);
+
+//Função para processamento de tiro 
+//Recebe o jogo e as coordenadas e retorna o resultado (EX:SHOT_HIT)
+ShotResult game_handle_shot(Game *game, int row, int col);
+
+// Verifica se um navio específico afundou (hits >= length)
+// Retorna 1 (True) se afundou, 0 (False) se ainda está vivo
+int game_check_sunk_ship(Ship *ship);
+
+
+// Verifica se o jogo acabou (se todos os navios do oponente afundaram).
+// Retorna 1 (Vitória/Fim) ou 0 (Continua).
+// Também atualiza a flag game->game_over.
+int game_check_win_condition(Game *game);
+
+#endif //GAME_H

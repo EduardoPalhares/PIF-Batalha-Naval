@@ -46,41 +46,35 @@ Cell* board_get_cell(Board *board, int row, int col){
 }
 
 
+static char get_cell_symbol(CellState state, int show_ships) {
+    switch (state) {
+        case CELL_WATER: return '~';
+        case CELL_HIT:   return 'X';
+        case CELL_MISS:  return '.';
+        case CELL_SHIP:  return (show_ships) ? 'S' : '~';
+        default:         return '?';
+    }
+}
+
 // Exibe o estado atual do tabuleiro no terminal
 // show_ships: 1 para mostrar os navios (jogador vendo seu próprio mapa)
 // show_ships: 0 para esconder os navios (jogador vendo o mapa do inimigo)
-void board_display(Board *board,int show_ships){
-    // Imprime o cabeçalho das colunas (A, B, C, ...)
-    printf("  ");                     //Espaço para alinhar com os números das linhas
-    for (int j=0;j< board->cols;j++){
-        printf("%c ", 'A'+j);
-    }
+void board_display(Board *board, int show_ships) {
+    // Cabeçalho
+    printf("   "); 
+    for (int j = 0; j < board->cols; j++) printf("%c ", 'A' + j);
     printf("\n");
 
-    for (int i=0;i<board->rows;i++){
-        printf("%2d",i+1);                 //impressão dos números das linhas
+    //Tabuleiro
+    for (int i = 0; i < board->rows; i++) {
+        printf("%2d ", i + 1); // Número da linha
 
-        for (int j=0; j<board->cols;j++){
-            Cell *cell=board_get_cell(board,i,j);           //Obtém o ponteiro para a célula atual, usando a função auxiliar.
-
-            char simbolo='?';                   //Variável para armazenar o símbolo a ser impresso.
-            switch (cell->state){               //Estrutura de controle 'switch' para determinar o símbolo com base no estado da célula.
-                case CELL_WATER:
-                simbolo='~';
-                break;
-                case CELL_SHIP:
-                simbolo=(show_ships) ? 'S' : '~';                // Se show_ships for 1 (verdadeiro), mostra 'S'. Senão, esconde como água '~'.
-                break;
-                case CELL_HIT:
-                    simbolo = 'X';                               // Navio atingido
-                    break;
-                case CELL_MISS:
-                    simbolo = '.';                               // Tiro na água
-                    break;
-            }
-             printf("%c ", simbolo);//Mostra o simbolo
+        for (int j = 0; j < board->cols; j++) {
+            Cell *c = board_get_cell(board, i, j);
+            //Aqui sai simbolo na tela
+            printf("%c ", get_cell_symbol(c->state, show_ships));
         }
-            printf("\n");//pula para próxima linha
+        printf("\n");
     }
 }
 

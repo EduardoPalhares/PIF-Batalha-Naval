@@ -54,4 +54,7 @@ void game_place_ships_auto(Player *p, int board_size);
 // Coloca navios manualmente (lógica de I/O)
 void game_place_ships_manual(Player *p, int board_size);
 
+// Executa o loop principal de turnos do jogo.
+void game_loop(Game *game, char placement_mode);
+
 #endif //GAME_H

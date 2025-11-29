@@ -165,15 +165,7 @@ void game_place_ships_manual(Player *p, int board_size) {
     }
 }
 
-// Arquivo: game.c
-// ... includes e demais funções ...
-
-// Lembre-se de incluir o protótipo no game.h
-// void game_loop(Game *game, char placement_mode);
-
-// ===================================================================================
-// FUNÇÃO: game_loop
-// Objetivo: Controla o fluxo de turnos, I/O do usuário, processamento de tiros e
+//Controla o fluxo de turnos, I/O do usuário, processamento de tiros e
 //           verificação da condição de vitória.
 // ===================================================================================
 void game_loop(Game *game, char placement_mode) {
@@ -181,31 +173,53 @@ void game_loop(Game *game, char placement_mode) {
     ShotResult result;
     Player *current_p, *enemy_p;
     printf("\n=== FASE DE POSICIONAMENTO ===\n");
-    if (placement_mode == 'M') {                                        // Posiciona navios para o Jogador 1
+    if (placement_mode == 'M') {                                 // Posiciona navios para o Jogador 1
         game_place_ships_manual(&game->p1, game->p1.board.rows);
     } else { // 'A'
         game_place_ships_auto(&game->p1, game->p1.board.rows);
     }
-    if (placement_mode == 'M') {                                     // Posiciona navios para o Jogador 2
+    if (placement_mode == 'M') {                                         // Posiciona navios para o Jogador 2
         game_place_ships_manual(&game->p2, game->p2.board.rows);
     } else { // 'A'
         game_place_ships_auto(&game->p2, game->p2.board.rows);
     }
-    game->current_player = 0;                                            // Define o Jogador 1 como o primeiro a jogar.
+    game->current_player = 0;                                // Define o Jogador 1 como o primeiro a jogar
     printf("\n=== INICIO DA BATALHA ===\n");
-    while (game->game_over == 0) {                                     // LOOP PRINCIPAL DE TURNOS
-        current_p = (game->current_player == 0) ? &game->p1 : &game->p2;                                // Identifica o jogador da vez e o oponente.
+    while (game->game_over == 0) {                        // LOOP PRINCIPAL DE TURNOS
+        current_p = (game->current_player == 0) ? &game->p1 : &game->p2;                       // Identifica o jogador da vez e o oponente.
         enemy_p = (game->current_player == 0) ? &game->p2 : &game->p1;
         printf("\n--- TURNO DE %s ---\n", current_p->nickname);
-        printf("Seu tabuleiro de tiros (Inimigo: %s):\n", enemy_p->nickname);                                  // Exibe o tabuleiro do inimigo (shots) para que o jogador saiba onde atirar. Assumindo que board_show_hidden está implementado (você o fará em board.c)
+        printf("Seu tabuleiro de tiros (Inimigo: %s):\n", enemy_p->nickname);                              // Exibe o tabuleiro do inimigo (shots) para que o jogador saiba onde atirar. Assumindo que board_show_hidden está implementado (você o fará em board.c)
         board_show_hidden(&current_p->shots); 
-        do {                                                // Loop de tiro: Garante que o jogador só avance se acertar um tiro válido.
-            if (!io_get_shot_coord(current_p->board.rows, &row, &col)) {                            // board_size é o tamanho da linha (rows), que deve ser igual a cols.
-                break;                                          // Em caso de erro de I/O, avança para o próximo jogador (opcional).
+        do {                               // Loop de tiro: Garante que o jogador só avance se acertar um tiro válido.
+            if (!io_get_shot_coord(current_p->board.rows, &row, &col)) {                             // board_size é o tamanho da linha (rows), que deve ser igual a cols.
+                break;                                           // Em caso de erro de I/O, avança para o próximo jogador (opcional).
             }
-            result = game_handle_shot(game, row, col);                         // PROCESSAMENTO DO TIRO (Lógica do Game)
+            result = game_handle_shot(game, row, col);                            // PROCESSAMENTO DO TIRO (Lógica do Game)
             if (result == SHOT_REPEATED) {                                       // FEEDBACK E VERIFICAÇÃO DE RESULTADO
                 printf("Voce ja atirou nessa coordenada. Tente outra.\n");
+                // Continua o loop 'do-while' para pedir novo tiro.
+            } else if (result == SHOT_INVALID) {
+                printf("Coordenada invalida para o tabuleiro. Tente novamente.\n");
+                // Continua o loop 'do-while'.
+            } else {
+                const char *ship_name = "Navio";               // Tiro bem-sucedido (MISS, HIT, SUNK). Determina o nome do navio, se houver acerto ou afundamento.
+                bool is_sunk = false;
+                if (result == SHOT_HIT || result == SHOT_SUNK) {
+                    int ship_id = board_get_cell(&enemy_p->board, row, col)->ship_id;                             // O navio está no tabuleiro real do inimigo (enemy_p->board).
+                    if (ship_id >= 0 && ship_id < enemy_p->fleet.count) {
+                        ship_name = enemy_p->fleet.ships[ship_id].name;
+                        is_sunk = (result == SHOT_SUNK);
+                    }
+                }
+                io_show_shot_result(board_get_cell(&current_p->shots, row, col)->state, ship_name, is_sunk);                               // Exibe o resultado do tiro para o usuário.
+                break; 
             }
+        } while (1);             // Loop de tiro
+        if (game_check_win_condition(game)) {                        // VERIFICAÇÃO DE VITÓRIA
+            break;                                      // Se game->game_over foi setado para 1, o loop 'while' externo irá parar.
         }
+        game->current_player = 1 - game->current_player;                                    // TROCA DE TURNO. Alterna entre 0 e 1.
+    }
+    io_show_winner_stats(current_p, enemy_p);                           // O vencedor é o jogador atual (current_p) porque ele acabou de afundar o último navio do oponente (enemy_p).
 }

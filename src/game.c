@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "game.h"
+#include "io.h"
+#include "fleet.h"
 
 // Inicializa toda a estrutura do jogo
 Game game_init(int rows, int cols) {
@@ -119,4 +121,46 @@ int game_check_win_condition(Game *game) {
     //Se passou pelo loop, todos os navios afundaram!
     game->game_over = 1; // Atualiza a flag de estado do jogo
     return 1; // Vitória decretada
+}
+
+// Lógica para posicionar navios manualmente.
+void game_place_ships_manual(Player *p, int board_size) {
+    int i, r, c;
+    char orientation_char;
+    Orientation orient;
+    printf("\n=== POSICIONAMENTO MANUAL: %s ===\n", p->nickname);
+    printf("Você posicionará %d navios.\n", p->fleet.count);
+    for (i = 0; i < p->fleet.count; i++) {                             // Itera sobre CADA navio na frota
+        Ship *current_ship = &p->fleet.ships[i];
+        printf("\nNavio %d de %d: %s (Tamanho %d)\n", 
+               i + 1, p->fleet.count, current_ship->name, current_ship->length);
+        do {                                    // Loop de validação: Repete até que o navio seja colocado em um local válido.
+            if (!io_get_shot_coord(board_size, &r, &c)) {                            // Usamos io_get_shot_coord para aproveitar a validação de formato e limites.
+                continue;                                                           // Em caso de erro fatal de leitura do I/O, avança para o próximo navio ou sai.
+            }
+            printf("Orientacao (H para Horizontal, V para Vertical): ");                               // LEITURA DA ORIENTAÇÃO
+            if (scanf(" %c", &orientation_char) != 1) {                                  // Lê o caractere e converte para maiúsculo
+                printf("Entrada invalida. Tente novamente.\n");
+                clear_input_buffer();
+                continue;
+            }
+            clear_input_buffer();
+            orientation_char = toupper(orientation_char);
+            if (orientation_char == 'H') {
+                orient = ORIENT_H;
+            } else if (orientation_char == 'V') {
+                orient = ORIENT_V;
+            } else {
+                printf("Orientacao invalida. Use H ou V.\n");
+                continue;
+            }
+            if (fleet_check_placement(&p->board, current_ship, r, c, orient) == 1) {                              // Nota: O seu fleet_check_placement retorna 1 (OK) ou 0 (Inválido).
+                fleet_place_ship(&p->board, current_ship, i, r, c, orient);                                          // O ship_id é o índice 'i' do loop.
+                printf("%s posicionado com sucesso!\n", current_ship->name);
+                break;                             // Sai do loop 'do-while' interno e avança para o próximo navio.
+            } else {
+                printf("Posicao invalida: Colisao com outro navio ou fora dos limites do tabuleiro.\n");
+            }
+        } while (1);                                     // Repete infinitamente até o 'break' ser alcançado (posicionamento válido).
+    }
 }

@@ -43,10 +43,15 @@ ShotResult game_handle_shot(Game *game, int row, int col);
 // Retorna 1 (True) se afundou, 0 (False) se ainda está vivo
 int game_check_sunk_ship(Ship *ship);
 
-
 // Verifica se o jogo acabou (se todos os navios do oponente afundaram).
 // Retorna 1 (Vitória/Fim) ou 0 (Continua).
 // Também atualiza a flag game->game_over.
 int game_check_win_condition(Game *game);
+
+// Coloca navios automaticamente (lógica de pos. aleatório)
+void game_place_ships_auto(Player *p, int board_size); 
+
+// Coloca navios manualmente (lógica de I/O)
+void game_place_ships_manual(Player *p, int board_size);
 
 #endif //GAME_H

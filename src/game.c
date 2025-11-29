@@ -164,3 +164,48 @@ void game_place_ships_manual(Player *p, int board_size) {
         } while (1);                                     // Repete infinitamente até o 'break' ser alcançado (posicionamento válido).
     }
 }
+
+// Arquivo: game.c
+// ... includes e demais funções ...
+
+// Lembre-se de incluir o protótipo no game.h
+// void game_loop(Game *game, char placement_mode);
+
+// ===================================================================================
+// FUNÇÃO: game_loop
+// Objetivo: Controla o fluxo de turnos, I/O do usuário, processamento de tiros e
+//           verificação da condição de vitória.
+// ===================================================================================
+void game_loop(Game *game, char placement_mode) {
+    int row, col;
+    ShotResult result;
+    Player *current_p, *enemy_p;
+    printf("\n=== FASE DE POSICIONAMENTO ===\n");
+    if (placement_mode == 'M') {                                        // Posiciona navios para o Jogador 1
+        game_place_ships_manual(&game->p1, game->p1.board.rows);
+    } else { // 'A'
+        game_place_ships_auto(&game->p1, game->p1.board.rows);
+    }
+    if (placement_mode == 'M') {                                     // Posiciona navios para o Jogador 2
+        game_place_ships_manual(&game->p2, game->p2.board.rows);
+    } else { // 'A'
+        game_place_ships_auto(&game->p2, game->p2.board.rows);
+    }
+    game->current_player = 0;                                            // Define o Jogador 1 como o primeiro a jogar.
+    printf("\n=== INICIO DA BATALHA ===\n");
+    while (game->game_over == 0) {                                     // LOOP PRINCIPAL DE TURNOS
+        current_p = (game->current_player == 0) ? &game->p1 : &game->p2;                                // Identifica o jogador da vez e o oponente.
+        enemy_p = (game->current_player == 0) ? &game->p2 : &game->p1;
+        printf("\n--- TURNO DE %s ---\n", current_p->nickname);
+        printf("Seu tabuleiro de tiros (Inimigo: %s):\n", enemy_p->nickname);                                  // Exibe o tabuleiro do inimigo (shots) para que o jogador saiba onde atirar. Assumindo que board_show_hidden está implementado (você o fará em board.c)
+        board_show_hidden(&current_p->shots); 
+        do {                                                // Loop de tiro: Garante que o jogador só avance se acertar um tiro válido.
+            if (!io_get_shot_coord(current_p->board.rows, &row, &col)) {                            // board_size é o tamanho da linha (rows), que deve ser igual a cols.
+                break;                                          // Em caso de erro de I/O, avança para o próximo jogador (opcional).
+            }
+            result = game_handle_shot(game, row, col);                         // PROCESSAMENTO DO TIRO (Lógica do Game)
+            if (result == SHOT_REPEATED) {                                       // FEEDBACK E VERIFICAÇÃO DE RESULTADO
+                printf("Voce ja atirou nessa coordenada. Tente outra.\n");
+            }
+        }
+}

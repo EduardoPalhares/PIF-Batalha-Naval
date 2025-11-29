@@ -1,6 +1,8 @@
 //Regras do jogo e controle dos turnos
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdbool.h>
 #include "game.h"
 #include "io.h"
 #include "fleet.h"

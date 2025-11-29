@@ -125,6 +125,46 @@ int game_check_win_condition(Game *game) {
     return 1; // Vitória decretada
 }
 
+// Lógica principal para posicionar todos os navios de forma aleatória.
+void game_place_ships_auto(Player *p, int board_size) {
+    int i;
+    int r, c; // Coordenadas (linha, coluna)
+    Orientation orient;
+
+    printf("Posicionando navios de %s automaticamente...\n", p->nickname);
+
+    // Itera sobre CADA navio na frota do jogador
+    for (i = 0; i < p->fleet.count; i++) {
+        Ship *current_ship = &p->fleet.ships[i];
+
+        // O loop interno garante que o navio só seja colocado quando for um local VÁLIDO.
+        do {
+            // 1. GERAÇÃO ALEATÓRIA DE COORDENADAS (r, c)
+            // Gera um índice de linha (r) e coluna (c) entre 0 e (board_size - 1).
+            r = rnd_get_int(0, board_size - 1);
+            c = rnd_get_int(0, board_size - 1);
+
+            // 2. GERAÇÃO ALEATÓRIA DE ORIENTAÇÃO
+            // Gera 0 (Horizontal) ou 1 (Vertical).
+            orient = (Orientation)rnd_get_int(0, 1);
+            
+            // 3. TENTATIVA DE COLOCAÇÃO
+            // Verifica a validade e coloca o navio se o local for bom.
+            if (fleet_check_placement(&p->board, current_ship, r, c, orient) == 1) {
+                // Se o local é válido, grava no tabuleiro e seta current_ship->placed = 1
+                fleet_place_ship(&p->board, current_ship, i, r, c, orient);
+                break; // Sai do loop 'do-while'
+            }
+            
+            // Se não for válido, o loop continua e novas coordenadas/orientação são geradas.
+
+        } while (1); // Repete infinitamente até o 'break' ser alcançado.
+
+        printf("-> %s posicionado (Tamanho %d).\n", current_ship->name, current_ship->length);
+    }
+    printf("Todos os navios de %s foram posicionados.\n", p->nickname);
+}
+
 // Lógica para posicionar navios manualmente.
 void game_place_ships_manual(Player *p, int board_size) {
     int i, r, c;
@@ -167,9 +207,7 @@ void game_place_ships_manual(Player *p, int board_size) {
     }
 }
 
-//Controla o fluxo de turnos, I/O do usuário, processamento de tiros e
-//           verificação da condição de vitória.
-// ===================================================================================
+//verificação da condição de vitória.
 void game_loop(Game *game, char placement_mode) {
     int row, col;
     ShotResult result;

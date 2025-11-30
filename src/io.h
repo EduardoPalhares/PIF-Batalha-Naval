@@ -21,4 +21,5 @@ void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk)
 
 void io_show_winner_stats(const Player *winner, const Player *loser);                 // Exibe o vencedor e as estatísticas de ambos os jogadores ao final do jogo.
 
+void io_show_fleet_rule();  //Exibe a composição de frotas para os jogadores
 #endif

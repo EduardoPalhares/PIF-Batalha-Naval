@@ -185,3 +185,14 @@ void io_show_winner_stats(const Player *winner, const Player *loser) {
     printf("\n--- Estatisticas do Perdedor ---\n");                             // Imprime as estatísticas do Perdedor.
     print_player_stats(loser);
 }
+
+//Exibe a composição de frotas para os jogadores
+
+void io_show_fleet_rule() {
+    printf("\n=== COMPOSICAO DA FROTA ===\n");
+    printf("- 1 Porta-avioes (5 celulas)\n");
+    printf("- 1 Encouracado  (4 celulas)\n");
+    printf("- 2 Cruzadores   (3 celulas)\n");
+    printf("- 2 Destroyers   (2 celulas)\n");
+    printf("===========================\n");
+}

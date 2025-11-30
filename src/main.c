@@ -14,22 +14,22 @@ void run_game_session() {
     char p1_name[32];
     char p2_name[32];
 
-    // 1. Coleta de Dados
+    //Coleta de Dados
     io_get_player_names(p1_name, p2_name);
     io_get_settings(&size, &mode);
+    io_show_fleet_rule();
 
     printf("\n=== PREPARANDO O TABULEIRO [%dx%d] ===\n", size, size);
-
-    // 2. Inicialização do Jogo
+    //  Inicialização do Jogo
     Game jogo = game_init(size, size);
     strcpy(jogo.p1.nickname, p1_name);
     strcpy(jogo.p2.nickname, p2_name);
 
-    // 3. Inicia o Loop Principal (Posicionamento + Batalha)
+    // Inicia o Loop Principal (Posicionamento + Batalha)
     // Agora chamamos a função real que está no game.c!
     game_loop(&jogo, mode);
 
-    // 4. Encerramento e Limpeza
+    // Encerramento e Limpeza
     game_destroy(&jogo);
     printf("\n=== MEMORIA LIBERADA. FIM DA SESSAO ===\n");
 }

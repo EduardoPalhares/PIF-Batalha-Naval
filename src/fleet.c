@@ -5,35 +5,52 @@
 #include "fleet.h"
 
 //Função privada usada para criação de frota padrão(Função privada)
-static void setup_ship(Ship *s, const char *name, int length){
-    strcpy(s->name, name);// leva 
-    s->length=length; // Comprimento do navio com quantas celúlas ele tem
-    s->hits=0; // Inicializa o contador de acertos com 0 (navio novo, sem dano)
-    s->placed=0; // Navio está na memória
-}
+static void fleet_add_ship(Fleet *f, const char *name, int length) {
+    //  Aumenta a contagem de navios
+    f->count++;
 
+    //  Redimensiona o array de navios para caber mais um
+    // Se f->ships for NULL (primeira vez), o realloc funciona como malloc.
+    Ship *temp = (Ship *) realloc(f->ships, f->count * sizeof(Ship));
 
-//Frota padrão
-Fleet fleet_create(){
-    Fleet f;
-    f.count =6; //Total de návios
-
-    f.ships=(Ship *)malloc(f.count * sizeof(Ship));//Alocação para criar os espaços para os 6 navios na memória
-
-    if (f.ships == NULL) { 
-        printf("ERRO FATAL: Falha ao alocar memória para a frota.\n"); //Verifica o espaço na memória
+    if (temp == NULL) {
+        printf("ERRO FATAL: Falha ao realocar memoria para a frota.\n");
+        // Em caso de falha, liberamos o que já existia para evitar leak
+        free(f->ships); 
         exit(1);
     }
+    
+    f->ships = temp;
+    //  Configura o novo navio (que está na última posição: count - 1)
+    Ship *new_ship = &f->ships[f->count - 1];
+    strcpy(new_ship->name, name);
+    new_ship->length = length;
+    new_ship->hits = 0;
+    new_ship->placed = 0;
+}
 
-    setup_ship(&f.ships[0],"Porta-aviões", 5); //Porta-aviões
-    setup_ship(&f.ships[1],"Encouraçado",4); //Encouraçado
+//Frota padrão
+Fleet fleet_create() {
+    Fleet f;
+    f.count = 0;
+    f.ships = NULL; 
 
-    for(int i = 2; i <= 3; i++) {
-        setup_ship(&f.ships[i], "Cruzador", 3); // Cruzadores
-    }
-    for(int i = 4; i <= 5; i++) {
-        setup_ship(&f.ships[i], "Destroyer", 2); // Destroyers
-    }
+    // Adiciona os navios um a um dinamicamente chamando a NOVA função
+    
+    // 1 Porta-aviões (5)
+    fleet_add_ship(&f, "Porta-avioes", 5);
+    
+    // 1 Encouraçado (4)
+    fleet_add_ship(&f, "Encouracado", 4);
+
+    // 2 Cruzadores (3)
+    fleet_add_ship(&f, "Cruzador", 3);
+    fleet_add_ship(&f, "Cruzador", 3);
+
+    // 2 Destroyers (2)
+    fleet_add_ship(&f, "Destroyer", 2);
+    fleet_add_ship(&f, "Destroyer", 2);
+
     return f;
 }
 
@@ -41,7 +58,8 @@ Fleet fleet_create(){
 void fleet_destroy(Fleet *fleet) {
     if (fleet->ships != NULL) {
         free(fleet->ships);
-        fleet->ships = NULL; 
+        fleet->ships = NULL;
+        fleet->count = 0; 
     }
 }
 

@@ -19,6 +19,8 @@ typedef struct {
     Board shots;                          // Tabuleiro de tiros (visto do inimigo)
     Fleet fleet;                          // A frota de navios que pertence a este jogador
     char nickname[32];                    // Apelido ou nome do jogador
+    int total_shots;                      // Total de tiros disparados
+    int total_hits;                       // Total de tiros que acertaram (X)
 }Player;
 
 // Representa o estado geral e o controle do jogo

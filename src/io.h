@@ -17,7 +17,7 @@ void io_get_player_names(char *p1_nickname, char *p2_nickname);             // S
 
 bool io_get_shot_coord(int max_size, int *row, int *col);                // Lê e valida a coordenada de tiro, garantindo que esteja dentro dos limites.
 
-void io_show_shot_result(CellState result, const char *ship_name, bool is_sunk);              // Exibe o resultado de um tiro com base no estado da célula e no status do navio.
+void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk);              // Exibe o resultado de um tiro com base no estado da célula e no status do navio.
 
 void io_show_winner_stats(const Player *winner, const Player *loser);                 // Exibe o vencedor e as estatísticas de ambos os jogadores ao final do jogo.
 

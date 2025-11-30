@@ -87,7 +87,7 @@ void fleet_place_ship(Board *board, Ship *ship, int ship_id, int row, int col, O
         
         // Atualiza o estado da célula
         cell->state = CELL_SHIP;
-        cell->ship_id;  // Ex: 'A' - 'A' = 0; 'B' - 'A' = 1.d = ship_id;
+        cell->ship_id = ship_id;  // Ex: 'A' - 'A' = 0; 'B' - 'A' = 1.d = ship_id;
     }
 
     ship->placed = 1;      // Marca o navio como posicionado na struct dele

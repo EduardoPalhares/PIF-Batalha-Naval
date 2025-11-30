@@ -45,37 +45,59 @@ Cell* board_get_cell(Board *board, int row, int col){
     return &board->cells[index];                   //retorna o endereço daquela celula específica
 }
 
-
-static char get_cell_symbol(CellState state, int show_ships) {
-    switch (state) {
-        case CELL_WATER: return '~';
-        case CELL_HIT:   return 'X';
-        case CELL_MISS:  return '.';
-        case CELL_SHIP:  return (show_ships) ? 'S' : '~';
-        default:         return '?';
+//Símbolos personalizados
+static char get_cell_symbol(Cell *cell, int show_ships) {
+    // Se for Água ou Erro (Tiro na água), símbolos padrão
+    if (cell->state == CELL_WATER) return '~';
+    if (cell->state == CELL_MISS)  return '.';
+    // Se for Navio (Escondido ou Atingido)
+    char letra = '?';
+    switch (cell->ship_id) {
+        case 0: letra = 'P'; break; // Porta-aviões
+        case 1: letra = 'E'; break; // Encouraçado
+        case 2: 
+        case 3: letra = 'C'; break; // Cruzador
+        case 4: 
+        case 5: letra = 'D'; break; // Destroyer
+        default: letra = 'S'; break; // Genérico (segurança)
     }
+    // Lógica de Exibição
+    if (cell->state == CELL_HIT) {
+        return letra; // Se acertou, mostra a letra do navio (P, E, C, D) em vez de X
+    } 
+    if (cell->state == CELL_SHIP) {
+        // Se o navio está intacto:mostra a letra se for o meu tabuleiro (show_ships=1),
+        // esconde como água se for o inimigo (show_ships=0)
+        return (show_ships) ? letra : '~';
+    }
+    return '?';
 }
 
 // Exibe o estado atual do tabuleiro no terminal
-// show_ships: 1 para mostrar os navios (jogador vendo seu próprio mapa)
-// show_ships: 0 para esconder os navios (jogador vendo o mapa do inimigo)
 void board_display(Board *board, int show_ships) {
-    // Cabeçalho
+    // Cabeçalho das Colunas
     printf("   "); 
     for (int j = 0; j < board->cols; j++) printf("%c ", 'A' + j);
     printf("\n");
-
-    //Tabuleiro
+    //Linha Divisória Horizontal (---)
+    printf("   "); 
+    for (int j = 0; j < board->cols; j++) {
+        printf("--"); // Dois traços para cada coluna
+    }
+    printf("\n");
+    // Linhas do Tabuleiro
     for (int i = 0; i < board->rows; i++) {
-        printf("%2d ", i + 1); // Número da linha
-
+        printf("%2d|", i + 1); // Número da linha + Barra Vertical (|)
         for (int j = 0; j < board->cols; j++) {
             Cell *c = board_get_cell(board, i, j);
-            //Aqui sai simbolo na tela
-            printf("%c ", get_cell_symbol(c->state, show_ships));
+            // Agora passamos o ponteiro 'c' inteiro
+            printf("%c ", get_cell_symbol(c, show_ships));
         }
         printf("\n");
     }
+    printf("   Legenda: [~] Agua  [.] Errou o tiro\n");
+    printf("            [P] Porta-avioes  [E] Encouracado\n");
+    printf("            [C] Cruzador      [D] Destroyer\n");
 }
 
 

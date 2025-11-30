@@ -97,7 +97,10 @@ bool io_get_settings(int *board_size, char *placement_mode) {
 }
 
 void io_get_player_names(char *p1_nickname, char *p2_nickname) {                            //Objetivo: Solicitar e armazenar o nome dos dois jogadores.
-    printf("\n=== REGISTRO DE JOGADORES ===\n");
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    
+    printf("\n===REGISTRO DE JOGADORES===\n");
     printf("Nome do Jogador 1 (no máximo 31 caracteres): ");                            // 1. Leitura do Nome do Jogador 1
     fgets(p1_nickname, 32, stdin);
     p1_nickname[strcspn(p1_nickname, "\n")] = '\0';                                 // Usamos strcspn para encontrar a posição do '\n' e substituí-lo por '\0' (terminador de string).
@@ -135,33 +138,34 @@ bool io_get_shot_coord(int max_size, int *row, int *col) {
 
 
 //Exibir o resultado do tiro para o usuário (ÁGUA, ACERTOU, AFUNDOU).
-void io_show_shot_result(CellState result, const char *ship_name, bool is_sunk) {
+void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk) {
     printf("Resultado: ");
-    switch (result) {                                   // Usa a estrutura switch para determinar o resultado principal com base no CellState.
-        case CELL_WATER:
-        case CELL_MISS:
-            printf("AGUA.\n");                                 // O estado CELL_WATER e CELL_MISS (tiro na água) resultam em "ÁGUA".
-            break;
-        case CELL_SHIP:
-            // ou como o estado 'anterior' ao HIT, dependendo da lógica do jogo.
-            printf("ERRO DE LOGICA: Estado do navio inesperado.\n");                      // Tecnicamente, a célula não deveria estar em CELL_SHIP após o tiro, mas tratamos como erro ou como o estado 'anterior' ao HIT, dependendo da lógica do jogo.
-            break;
-        case CELL_HIT:
-            if (is_sunk) {                                       // Se foi um acerto (CELL_HIT), precisamos saber se este acerto afundou o navio.
-                printf("AFUNDOU %s!\n", ship_name);                                        // Se a flag is_sunk for true (verdadeira), o navio afundou.
-            } else {
-                printf("ACERTOU no %s!\n", ship_name);                                         // Se a flag for false, foi apenas um acerto.
-            }
-            break;
+
+    // Tratamento para ÁGUA
+    if (result == SHOT_MISS) {
+        printf("AGUA.\n");
+    }
+    // Tratamento para Erros (Repetido ou Inválido)
+    else if (result == SHOT_REPEATED || result == SHOT_INVALID) {
+        printf("Erro: Tiro repetido ou coordenada invalida.\n");
+    }
+    // Tratamento para Acertos (HIT ou SUNK)
+    else if (result == SHOT_HIT || result == SHOT_SUNK) {
+        // Verifica se afundou (pelo enum ou pela flag bool)
+        if (result == SHOT_SUNK || is_sunk) {
+            printf("AFUNDOU %s!\n", ship_name);
+        } else {
+            printf("ACERTOU no %s!\n", ship_name);
+        }
     }
 }
 
 
 //Calcula a precisão e imprime o bloco de estatísticas para um jogador.
 static void print_player_stats(const Player *p) {
-    // Usando valores simulados para a demonstração, até que você implemente o rastreamento:
-    int total_shots = 31;       
-    int hits = 17;        
+    //Valores reais
+    int total_shots = p->total_shots;    
+    int hits = p->total_hits;     
     
     double accuracy = 0.0;
     

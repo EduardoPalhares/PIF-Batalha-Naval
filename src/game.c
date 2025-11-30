@@ -6,24 +6,27 @@
 #include "game.h"
 #include "io.h"
 #include "fleet.h"
+#include "rnd.h"
 
 // Inicializa toda a estrutura do jogo
 Game game_init(int rows, int cols) {
     Game g;
-
     // Configuração do Jogador 1 
     // Cria o tabuleiro dos navios dele
     g.p1.board = board_create(rows, cols);
     g.p1.shots = board_create(rows, cols);        // Cria o tabuleiro de tiros (inicialmente vazio, só água)
-    g.p1.fleet = fleet_create();        // Cria a frota padrão
+    g.p1.fleet = fleet_create();                // Cria a frota padrão
 
     strcpy(g.p1.nickname, "Jogador 1");    // Define um nome padrão (será alterado depois pelo io_get_player_names)
-
+    g.p1.total_shots = 0;
+    g.p1.total_hits = 0;
     //  Configuração do Jogador 2 
     g.p2.board = board_create(rows, cols);
     g.p2.shots = board_create(rows, cols);
     g.p2.fleet = fleet_create();
     strcpy(g.p2.nickname, "Jogador 2");
+    g.p2.total_shots = 0; 
+    g.p2.total_hits = 0;  
 
     // Configurações Iniciais da Partida
     g.current_player = 0; // Jogador 1 começa
@@ -56,27 +59,26 @@ int game_check_sunk_ship(Ship *ship) {
 
 // Atualizar o estado das células e a vida do navio após um tiro válido.
 static ShotResult game_check_hit_or_miss(Player *enemy, Cell *shot_c, Cell *real_c) {
-    // O tiro acertou um navio (HIT)
+    // Acertou Navio (HIT)
     if (real_c->state == CELL_SHIP) {
-        shot_c->state = CELL_HIT; // Marca 'X' no meu tabuleiro de tiros (feedback visual)
-        real_c->state = CELL_HIT; // Marca 'X' no tabuleiro real do inimigo (computa dano)
-        // Lógica de Dano no Navio
+        shot_c->state = CELL_HIT; // Marca no visual
+        // Temos que copiar o ID do navio para o tabuleiro de tiros (visual),
+        shot_c->ship_id = real_c->ship_id; 
+
+        real_c->state = CELL_HIT; // Marca dano real
+
         int ship_id = real_c->ship_id;
-        // Validação de segurança para garantir que o ID existe na frota
         if (ship_id >= 0 && ship_id < enemy->fleet.count) {
             Ship *hit_ship = &enemy->fleet.ships[ship_id];
-            hit_ship->hits++; // Incrementa o contador de danos deste navio
-            // Verifica imediatamente se esse tiro afundou o navio
-            if (game_check_sunk_ship(hit_ship)) {
-                return SHOT_SUNK; // Retorna aviso de "AFUNDOU!"
-            }
+            hit_ship->hits++; 
+            if (game_check_sunk_ship(hit_ship)) return SHOT_SUNK;
         }
-        return SHOT_HIT; // Retorna aviso de "ACERTOU!"
+        return SHOT_HIT;
     } 
-    // O tiro caiu na água (MISS)
+    // Errou (MISS)
     else {
-        shot_c->state = CELL_MISS; // Marca '.' no meu tabuleiro de tiros
-        return SHOT_MISS; // Retorna aviso de "ÁGUA"
+        shot_c->state = CELL_MISS;
+        return SHOT_MISS;
     }
 }
 
@@ -92,15 +94,17 @@ ShotResult game_handle_shot(Game *game, int row, int col) {
     Cell *real_c = board_get_cell(&enemy->board, row, col);   // O que existe de verdade
 
     // Validações de Regra (Fluxos Alternativos)
-    if (!shot_c || !real_c) {
-        return SHOT_INVALID; // Erro: Coordenada fora do mapa
-    }
-    if (shot_c->state != CELL_WATER) {
-        return SHOT_REPEATED; // Erro: Já atirou aqui (tem HIT ou MISS)
+    if (!shot_c || !real_c) return SHOT_INVALID;            //Coordeanda inválida, fora do mapa
+    if (shot_c->state != CELL_WATER) return SHOT_REPEATED;  //Coordenada repetida
+
+    shooter->total_shots++; // Contabiliza o tiro
+    ShotResult res = game_check_hit_or_miss(enemy, shot_c, real_c);
+    if (res == SHOT_HIT || res == SHOT_SUNK) {
+        shooter->total_hits++; // Contabiliza o acerto
     }
 
     //Se passou nas validações, chama a lógica de acerto/erro
-    return game_check_hit_or_miss(enemy, shot_c, real_c);
+    return res;
 }
 
 // Verifica se o jogo acabou (se todos os navios do oponente afundaram).
@@ -127,139 +131,124 @@ int game_check_win_condition(Game *game) {
 
 // Lógica principal para posicionar todos os navios de forma aleatória.
 void game_place_ships_auto(Player *p, int board_size) {
-    int i;
-    int r, c; // Coordenadas (linha, coluna)
-    Orientation orient;
-
     printf("Posicionando navios de %s automaticamente...\n", p->nickname);
-
-    // Itera sobre CADA navio na frota do jogador
-    for (i = 0; i < p->fleet.count; i++) {
-        Ship *current_ship = &p->fleet.ships[i];
-
-        // O loop interno garante que o navio só seja colocado quando for um local VÁLIDO.
-        do {
-            // 1. GERAÇÃO ALEATÓRIA DE COORDENADAS (r, c)
-            // Gera um índice de linha (r) e coluna (c) entre 0 e (board_size - 1).
-            r = rnd_get_int(0, board_size - 1);
-            c = rnd_get_int(0, board_size - 1);
-
-            // 2. GERAÇÃO ALEATÓRIA DE ORIENTAÇÃO
-            // Gera 0 (Horizontal) ou 1 (Vertical).
-            orient = (Orientation)rnd_get_int(0, 1);
+    for (int i = 0; i < p->fleet.count; i++) {
+        Ship *s = &p->fleet.ships[i];
+        // Tenta posições aleatórias até encontrar uma válida
+        while (1) {
+            int r = rnd_get_int(0, board_size - 1);
+            int c = rnd_get_int(0, board_size - 1);
+            Orientation o = (Orientation)rnd_get_int(0, 1);
             
-            // 3. TENTATIVA DE COLOCAÇÃO
-            // Verifica a validade e coloca o navio se o local for bom.
-            if (fleet_check_placement(&p->board, current_ship, r, c, orient) == 1) {
-                // Se o local é válido, grava no tabuleiro e seta current_ship->placed = 1
-                fleet_place_ship(&p->board, current_ship, i, r, c, orient);
-                break; // Sai do loop 'do-while'
+            if (fleet_check_placement(&p->board, s, r, c, o)) {
+                fleet_place_ship(&p->board, s, i, r, c, o);
+                break;   //Sucesso, vai para o próximo navio
             }
-            
-            // Se não for válido, o loop continua e novas coordenadas/orientação são geradas.
-
-        } while (1); // Repete infinitamente até o 'break' ser alcançado.
-
-        printf("-> %s posicionado (Tamanho %d).\n", current_ship->name, current_ship->length);
+        }
     }
     printf("Todos os navios de %s foram posicionados.\n", p->nickname);
 }
-
-// Lógica para posicionar navios manualmente.
+// Pergunta orientação ao usuário (H/V)
+static Orientation ask_orientation() {
+    char input[100]; // Buffer para ler a linha inteira
+    char c;
+    
+    while (1) {
+        printf("Orientacao (H/V): ");
+        
+        // Lê a linha inteira (incluindo o Enter), limpando o buffer automaticamente
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+            continue;
+        }
+        // Usa sscanf para extrair o primeiro caractere útil do buffer lido
+        // O espaço em " %c" ignora espaços em branco acidentais antes da letra
+        if (sscanf(input, " %c", &c) == 1) {
+            c = toupper(c);
+            if (c == 'H') return ORIENT_H;
+            if (c == 'V') return ORIENT_V;
+        }
+        // Feedback visual se errar a letra
+        printf("Orientacao invalida. Digite H para Horizontal ou V para Vertical.\n");
+    }
+}
+//Lógica para posicionar um único navio manualmente
+static void place_single_ship_manual(Player *p, Ship *s, int ship_id, int size) {
+    int r, c;
+    Orientation o;
+    printf("Posicione: %s (Tam %d)\n", s->name, s->length);
+    while (1) {     // Tenta ler coord e orientação até ser válido
+        if (!io_get_shot_coord(size, &r, &c)) continue;
+        o = ask_orientation();
+        
+        if (fleet_check_placement(&p->board, s, r, c, o)) {
+            fleet_place_ship(&p->board, s, ship_id, r, c, o);
+            printf("Sucesso!\n");
+            break;
+        } else {
+            printf("Posicao invalida (colisao ou fora do mapa).\n");
+        }
+    }
+}
+// Gerencia o posicionamento manual de toda a frota
 void game_place_ships_manual(Player *p, int board_size) {
-    int i, r, c;
-    char orientation_char;
-    Orientation orient;
     printf("\n=== POSICIONAMENTO MANUAL: %s ===\n", p->nickname);
-    printf("Você posicionará %d navios.\n", p->fleet.count);
-    for (i = 0; i < p->fleet.count; i++) {                             // Itera sobre CADA navio na frota
-        Ship *current_ship = &p->fleet.ships[i];
-        printf("\nNavio %d de %d: %s (Tamanho %d)\n", 
-               i + 1, p->fleet.count, current_ship->name, current_ship->length);
-        do {                                    // Loop de validação: Repete até que o navio seja colocado em um local válido.
-            if (!io_get_shot_coord(board_size, &r, &c)) {                            // Usamos io_get_shot_coord para aproveitar a validação de formato e limites.
-                continue;                                                           // Em caso de erro fatal de leitura do I/O, avança para o próximo navio ou sai.
-            }
-            printf("Orientacao (H para Horizontal, V para Vertical): ");                               // LEITURA DA ORIENTAÇÃO
-            if (scanf(" %c", &orientation_char) != 1) {                                  // Lê o caractere e converte para maiúsculo
-                printf("Entrada invalida. Tente novamente.\n");
-                clear_input_buffer();
-                continue;
-            }
-            clear_input_buffer();
-            orientation_char = toupper(orientation_char);
-            if (orientation_char == 'H') {
-                orient = ORIENT_H;
-            } else if (orientation_char == 'V') {
-                orient = ORIENT_V;
-            } else {
-                printf("Orientacao invalida. Use H ou V.\n");
-                continue;
-            }
-            if (fleet_check_placement(&p->board, current_ship, r, c, orient) == 1) {                              // Nota: O seu fleet_check_placement retorna 1 (OK) ou 0 (Inválido).
-                fleet_place_ship(&p->board, current_ship, i, r, c, orient);                                          // O ship_id é o índice 'i' do loop.
-                printf("%s posicionado com sucesso!\n", current_ship->name);
-                break;                             // Sai do loop 'do-while' interno e avança para o próximo navio.
-            } else {
-                printf("Posicao invalida: Colisao com outro navio ou fora dos limites do tabuleiro.\n");
-            }
-        } while (1);                                     // Repete infinitamente até o 'break' ser alcançado (posicionamento válido).
+    for (int i = 0; i < p->fleet.count; i++) {
+        place_single_ship_manual(p, &p->fleet.ships[i], i, board_size);
     }
 }
 
-//verificação da condição de vitória.
-void game_loop(Game *game, char placement_mode) {
-    int row, col;
-    ShotResult result;
-    Player *current_p, *enemy_p;
-    printf("\n=== FASE DE POSICIONAMENTO ===\n");
-    if (placement_mode == 'M') {                                 // Posiciona navios para o Jogador 1
-        game_place_ships_manual(&game->p1, game->p1.board.rows);
-    } else { // 'A'
-        game_place_ships_auto(&game->p1, game->p1.board.rows);
+// Gerencia um turno completo (Exibir -> Ler -> Atirar -> Resultado)
+static void process_turn(Game *game, Player *current, Player *enemy) {
+    int r, c;
+    printf("\n--- TURNO DE %s ---\n", current->nickname);
+    printf("Seus tiros (Inimigo: %s):\n", enemy->nickname);
+
+    board_display(&current->shots, 0); 
+
+    while (1) {     // Loop até conseguir um tiro válido
+        if (!io_get_shot_coord(current->board.rows, &r, &c)) continue;
+        
+        ShotResult res = game_handle_shot(game, r, c);
+        if (res == SHOT_INVALID || res == SHOT_REPEATED) {
+            printf("Tiro invalido ou repetido. Tente de novo.\n");
+            continue;
+        }
+        
+        // Exibe resultado
+        const char *s_name = "Navio";
+        bool sunk = (res == SHOT_SUNK);
+        if (res == SHOT_HIT || sunk) {
+             int sid = board_get_cell(&enemy->board, r, c)->ship_id;
+             if (sid >= 0) s_name = enemy->fleet.ships[sid].name;
+        }
+        io_show_shot_result(res, s_name, sunk);
+        break; // Turno concluído
     }
-    if (placement_mode == 'M') {                                         // Posiciona navios para o Jogador 2
+}
+
+
+// Executa o loop principal de turnos do jogo.
+void game_loop(Game *game, char placement_mode) {
+    if (placement_mode == 'M') {
+        game_place_ships_manual(&game->p1, game->p1.board.rows);   //Fase de posicionamento
         game_place_ships_manual(&game->p2, game->p2.board.rows);
-    } else { // 'A'
+    } else {
+        game_place_ships_auto(&game->p1, game->p1.board.rows);
         game_place_ships_auto(&game->p2, game->p2.board.rows);
     }
-    game->current_player = 0;                                // Define o Jogador 1 como o primeiro a jogar
+    game->current_player = 0;//Fase de Batalha
     printf("\n=== INICIO DA BATALHA ===\n");
-    while (game->game_over == 0) {                        // LOOP PRINCIPAL DE TURNOS
-        current_p = (game->current_player == 0) ? &game->p1 : &game->p2;                       // Identifica o jogador da vez e o oponente.
-        enemy_p = (game->current_player == 0) ? &game->p2 : &game->p1;
-        printf("\n--- TURNO DE %s ---\n", current_p->nickname);
-        printf("Seu tabuleiro de tiros (Inimigo: %s):\n", enemy_p->nickname);                              // Exibe o tabuleiro do inimigo (shots) para que o jogador saiba onde atirar. Assumindo que board_show_hidden está implementado (você o fará em board.c)
-        board_show_hidden(&current_p->shots); 
-        do {                               // Loop de tiro: Garante que o jogador só avance se acertar um tiro válido.
-            if (!io_get_shot_coord(current_p->board.rows, &row, &col)) {                             // board_size é o tamanho da linha (rows), que deve ser igual a cols.
-                break;                                           // Em caso de erro de I/O, avança para o próximo jogador (opcional).
-            }
-            result = game_handle_shot(game, row, col);                            // PROCESSAMENTO DO TIRO (Lógica do Game)
-            if (result == SHOT_REPEATED) {                                       // FEEDBACK E VERIFICAÇÃO DE RESULTADO
-                printf("Voce ja atirou nessa coordenada. Tente outra.\n");
-                // Continua o loop 'do-while' para pedir novo tiro.
-            } else if (result == SHOT_INVALID) {
-                printf("Coordenada invalida para o tabuleiro. Tente novamente.\n");
-                // Continua o loop 'do-while'.
-            } else {
-                const char *ship_name = "Navio";               // Tiro bem-sucedido (MISS, HIT, SUNK). Determina o nome do navio, se houver acerto ou afundamento.
-                bool is_sunk = false;
-                if (result == SHOT_HIT || result == SHOT_SUNK) {
-                    int ship_id = board_get_cell(&enemy_p->board, row, col)->ship_id;                             // O navio está no tabuleiro real do inimigo (enemy_p->board).
-                    if (ship_id >= 0 && ship_id < enemy_p->fleet.count) {
-                        ship_name = enemy_p->fleet.ships[ship_id].name;
-                        is_sunk = (result == SHOT_SUNK);
-                    }
-                }
-                io_show_shot_result(board_get_cell(&current_p->shots, row, col)->state, ship_name, is_sunk);                               // Exibe o resultado do tiro para o usuário.
-                break; 
-            }
-        } while (1);             // Loop de tiro
-        if (game_check_win_condition(game)) {                        // VERIFICAÇÃO DE VITÓRIA
-            break;                                      // Se game->game_over foi setado para 1, o loop 'while' externo irá parar.
-        }
-        game->current_player = 1 - game->current_player;                                    // TROCA DE TURNO. Alterna entre 0 e 1.
-    }
-    io_show_winner_stats(current_p, enemy_p);                           // O vencedor é o jogador atual (current_p) porque ele acabou de afundar o último navio do oponente (enemy_p).
+    while (!game->game_over) {
+        Player *curr = (game->current_player == 0) ? &game->p1 : &game->p2;
+        Player *enemy = (game->current_player == 0) ? &game->p2 : &game->p1;
+        
+        process_turn(game, curr, enemy);
+        
+        if (game_check_win_condition(game)) break;
+        
+        game->current_player = 1 - game->current_player; // Alterna 0 e 1
+    }//Fim de jogo
+    Player *winner = (game->current_player == 0) ? &game->p1 : &game->p2;
+    Player *loser  = (game->current_player == 0) ? &game->p2 : &game->p1;
+    io_show_winner_stats(winner, loser);
 }

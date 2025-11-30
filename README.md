@@ -4,7 +4,7 @@ Projeto de implementação do clássico jogo Batalha Naval, desenvolvido inteira
 
 ---
 
-## 🎯 Contexto do Projeto
+##  Contexto do Projeto
 
 Este é o projeto final da disciplina de **Programação Imperativa e Funcional (PIFSI 2025.2)** do curso de Sistemas de Informação da **CESAR School**.
 
@@ -14,7 +14,7 @@ O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendi
 * **Alocação Dinâmica de Memória** (`malloc` e `free`).
 * **Modularização** e organização de código.
 
-## 👥 Equipe
+##  Equipe
 
 * **Artur Borges** ([LinkedIn](https://www.linkedin.com/in/arturborgesdnogueira/))
 * **Eduardo Palhares** ([LinkedIn](https://www.linkedin.com/in/palhareseduardo))
@@ -22,7 +22,7 @@ O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendi
 
 ---
 
-## ⚙️ Como Compilar e Executar
+##  Como Compilar e Executar
 
 O projeto utiliza um `Makefile` para automatizar o processo de compilação. Certifique-se de ter o `gcc` e o `make` instalados.
 
@@ -46,7 +46,7 @@ O projeto utiliza um `Makefile` para automatizar o processo de compilação. Cer
 
 ---
 
-## 📐 Decisões de Design e Implementação
+## Decisões de Design e Implementação
 
 Conforme solicitado no relatório técnico, destacamos as seguintes escolhas de arquitetura e design:
 
@@ -70,7 +70,7 @@ Toda a memória alocada dinamicamente para os tabuleiros e frotas (via `board_cr
 
 ---
 
-## 🎮 Funcionalidades
+##  Funcionalidades
 
 * [x] Tabuleiro configurável (6x6 a 26x26).
 * [x] Posicionamento de navios Manual e Automático (Aleatório).

@@ -58,7 +58,6 @@ int io_show_main_menu() {                                  //Exibir o menu inici
 //Limpa o buffer de entrada para evitar que caracteres residuais interfiram 
 static void clear_input_buffer() {
     int c;
-    // Descarta todos os caracteres até encontrar uma quebra de linha ('\n') ou o fim do arquivo (EOF).
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
@@ -67,7 +66,7 @@ static void clear_input_buffer() {
 bool io_get_settings(int *board_size, char *placement_mode) {
     int size = 0;
     char mode;
-    do {                                // 1. LEITURA E VALIDAÇÃO DO TAMANHO DO TABULEIRO
+    do {                                // leitura e validação do tamanho do tabuleiro
         printf("\nTamanho do tabuleiro (6-26): ");
         if (scanf("%d", &size) != 1) {                              //Tenta ler um inteiro. Se falhar (retornar 0), a entrada não foi numérica.
             printf("Entrada invalida. Digite um numero.\n");
@@ -79,9 +78,9 @@ bool io_get_settings(int *board_size, char *placement_mode) {
             printf("Tamanho invalido. Escolha um valor entre 6 e 26.\n"); }
     } while (size < 6 || size > 26);
     *board_size = size;                             // Armazena o tamanho validado no endereço de memória apontado por *board_size.
-    do {                                           // 2. LEITURA E VALIDAÇÃO DO MODO DE POSICIONAMENTO
+    do {                                           //leitura e validação do modo de posicionamento
         printf("Posicionamento manual ou automatico? Digite 'M' ou 'A'. > ");
-        if (scanf(" %c", &mode) != 1) {                                   // O espaço antes do %c ignora qualquer caractere de espaço em branco anterior (como \n).
+        if (scanf(" %c", &mode) != 1) {                                   
             printf("Modo invalido. Digite 'M' ou 'A'.\n");
             clear_input_buffer();
             continue;}
@@ -92,19 +91,19 @@ bool io_get_settings(int *board_size, char *placement_mode) {
             break;} 
             else { 
             printf("Modo invalido. Digite 'M' para Manual ou 'A' para Automatico.\n");}
-    } while (1);                                                            // Loop infinito até que o break seja alcançado.
+    } while (1);                                                            
     return true;                                                           // Retorna sucesso na leitura de configurações.
 }
 
-void io_get_player_names(char *p1_nickname, char *p2_nickname) {                            //Objetivo: Solicitar e armazenar o nome dos dois jogadores.
+void io_get_player_names(char *p1_nickname, char *p2_nickname) {                            //Solicitar e armazenar o nome dos dois jogadores.
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     
     printf("\n===REGISTRO DE JOGADORES===\n");
-    printf("Nome do Jogador 1 (no máximo 31 caracteres): ");                            // 1. Leitura do Nome do Jogador 1
+    printf("Nome do Jogador 1 (no máximo 31 caracteres): ");                        
     fgets(p1_nickname, 32, stdin);
     p1_nickname[strcspn(p1_nickname, "\n")] = '\0';                                 // Usamos strcspn para encontrar a posição do '\n' e substituí-lo por '\0' (terminador de string).
-    printf("Nome do Jogador 2 (no máximo 31 caracteres): ");                           // 2. Leitura do Nome do Jogador 2
+    printf("Nome do Jogador 2 (no máximo 31 caracteres): ");                           
     fgets(p2_nickname, 32, stdin);                 
     p2_nickname[strcspn(p2_nickname, "\n")] = '\0';
     printf("Nomes registrados!\n");
@@ -115,19 +114,19 @@ bool io_get_shot_coord(int max_size, int *row, int *col) {
     char input[10]; // Buffer para ler a coordenada (ex: A10, B5)
     int temp_row = -1, temp_col = -1;
     bool valid_input = false;
-    do {                        // Loop de validação: Repete até obter uma coordenada válida nos limites do tabuleiro.
+    do {                        // Loop de validação, repete até obter uma coordenada válida nos limites do tabuleiro.
         printf("Digite coordenada do tiro (ex.: E5): ");
-        if (fgets(input, sizeof(input), stdin) == NULL){                           // Uso de fgets para ler a coordenada de forma segura.
-            return false;                   // Erro de leitura.
+        if (fgets(input, sizeof(input), stdin) == NULL){            
+            return false;
         }
-        input[strcspn(input, "\n")] = '\0';                              // Limpa o caractere '\n' inserido pelo fgets.
+        input[strcspn(input, "\n")] = '\0';                             
         if (!io_converter_coord(input, &temp_row, &temp_col)) {                      // Tenta converter a string (ex: "B5") para índices numéricos (temp_row, temp_col).
             printf("Coordenada invalida. Formato incorreto (esperado LetraNumero, ex: A1).\n");
             continue; // Tenta novamente.
         }
         if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {                    // Verifica se os índices convertidos estão dentro dos limites do tabuleiro.
             printf("Coordenada fora dos limites do tabuleiro (%c1 a %c%d).\n", 'A', 'A' + max_size - 1, max_size);
-            continue;                     // Tenta novamente.
+            continue;                    
         }
         valid_input = true;                                        // Se chegou até aqui, a coordenada é válida.
     } while (!valid_input);
@@ -145,7 +144,7 @@ void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk)
     if (result == SHOT_MISS) {
         printf("AGUA.\n");
     }
-    // Tratamento para Erros (Repetido ou Inválido)
+    // Tratamento para Erros
     else if (result == SHOT_REPEATED || result == SHOT_INVALID) {
         printf("Erro: Tiro repetido ou coordenada invalida.\n");
     }
@@ -163,7 +162,6 @@ void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk)
 
 //Calcula a precisão e imprime o bloco de estatísticas para um jogador.
 static void print_player_stats(const Player *p) {
-    //Valores reais
     int total_shots = p->total_shots;    
     int hits = p->total_hits;     
     

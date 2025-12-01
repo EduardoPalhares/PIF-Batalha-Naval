@@ -7,50 +7,46 @@
 #include "io.h"
 
 bool io_converter_coord(const char *input, int *row, int *col){
-    if(input==NULL || strlen(input)<2){    // Validação inicial do ponteiro e do comprimento da string.
+    if(input==NULL || strlen(input)<2){                     //validação inicial do ponteiro e do comprimento da string.
         return false;
     }
-    char letra=toupper(input[0]);      // Pega o primeiro caractere (a letra) e o converte para maiúsculo.
+    char letra=toupper(input[0]);                   // pega o primeiro caractere, que no caso é a letra, e o converte para maiúsculo.
 
-    if (letra<'A' || letra >'Z'){     // Validação da Coluna: Garante que o primeiro caractere é uma letra válida (A-Z).
+    if (letra<'A' || letra >'Z'){                        //Garante que o primeiro caractere é uma letra válida (A-Z).
         return false;
     }
-    // A coluna é calculada subtraindo o valor ASCII de 'A' do valor ASCII da letra.
-    // O resultado é escrito no endereço de memória de *col (passagem por ponteiro).
-    *col=letra - 'A';
+    *col=letra - 'A';                                   // A coluna é calculada subtraindo o valor ASCII de 'A' do valor ASCII da letra. O resultado é escrito no endereço de memória de *col.
 
-    int numero =atoi(&input[1]);                             // Usa atoi() para converter a parte numérica da string (a partir do segundo caractere).
+    int numero =atoi(&input[1]);                             // Usa atoi() para converter a parte numérica da string, só a partir do segundo caractere.
      
     if (numero < 1) {
         return false;                                       //Bloquear números menores que 1
     }
-    //O índice da linha é o número do usuário - 1.
-    //O resultado é escrito no endereço de memória de *row (passagem por ponteiro).
+    //O índice da linha é o número do usuário - 1. O resultado é escrito no endereço de memória de *row.
     *row=numero-1;                                           //As linhas do tabuleiro são numeradas de 1 a N. O índice interno do array é 0 a N-1.
 
-
-    return true;                                              // A conversão da estrutura da string para números foi bem-sucedida.
+    return true;                                              // A conversão foi bem-sucedida.
 }
 
-int io_show_main_menu() {                                  //Exibir o menu inicial e ler/validar a opção do usuário.
+int io_show_main_menu() {                                  //Exibir o menu inicial e validar a opção do usuário.
     int opcao;
-    do {                                                    // Loop de leitura: repete até que uma opção válida (1, 2 ou 3) seja inserida.
+    do {                                                    //Repete até que uma opção válida seja inserida, aceitando apenas 1, 2 ou 3.
         printf("\n=== BATALHA NAVAL ===\n");
         printf("1) Novo jogo\n");
         printf("2) Configuracoes\n");
         printf("3) Sair\n");
         printf("> ");
-        if (scanf("%d", &opcao) != 1) {                               // Tenta ler a opção. Se o scanf retornar 0, a entrada não foi um número.
+        if (scanf("%d", &opcao) != 1) {                               //tenta ler a opção. Se o scanf retornar 0, a entrada não foi um número.
             printf("\nOpcao invalida. Digite um numero (1, 2 ou 3).\n");
-            int c;                                        // Limpa o buffer de entrada (stdin) para descartar caracteres inválidos (letras, etc.)
+            int c;                                        //Limpa o buffer de entrada para descartar caracteres inválidos
             while ((c = getchar()) != '\n' && c != EOF);
-            opcao = 0; // Força o loop a continuar
+            opcao = 0;                                          //Força o loop a continuar
             continue;
         }
         if (opcao < 1 || opcao > 3) {                                                   // Validação de intervalo
             printf("\nOpcao invalida. Escolha 1, 2 ou 3.\n");
         }
-    } while (opcao < 1 || opcao > 3); // O loop continua enquanto a opção for inválida.
+    } while (opcao < 1 || opcao > 3);                                      //o loop continua enquanto a opção for inválida.
     return opcao;
 }
 
@@ -62,7 +58,7 @@ static void clear_input_buffer() {
 }
 
 
-//Lidar com as configurações iniciais (tamanho do tabuleiro e modo).
+//Lida com as configurações iniciais, tamanho do tabuleiro e modo.
 bool io_get_settings(int *board_size, char *placement_mode) {
     int size = 0;
     char mode;
@@ -73,58 +69,58 @@ bool io_get_settings(int *board_size, char *placement_mode) {
             clear_input_buffer();                                   // Limpa o buffer para a próxima tentativa.
             size = 0;                                       //força a continuação do loop.
             continue;}
-        clear_input_buffer();                                // Limpa o buffer após uma leitura bem-sucedida de um número.
-        if (size < 6 || size > 26) {                                 // Validação de Limites (6 a 26)
+        clear_input_buffer();                                // limpa o buffer.
+        if (size < 6 || size > 26) {                                 //validação de Limites (6 a 26)
             printf("Tamanho invalido. Escolha um valor entre 6 e 26.\n"); }
     } while (size < 6 || size > 26);
-    *board_size = size;                             // Armazena o tamanho validado no endereço de memória apontado por *board_size.
+    *board_size = size;                             // armazena o tamanho validado no endereço de memória apontado por *board_size.
     do {                                           //leitura e validação do modo de posicionamento
         printf("Posicionamento manual ou automatico? Digite 'M' ou 'A'. > ");
         if (scanf(" %c", &mode) != 1) {                                   
             printf("Modo invalido. Digite 'M' ou 'A'.\n");
             clear_input_buffer();
             continue;}
-        clear_input_buffer();                             // Limpeza do buffer após a leitura do caractere (para o caso de entrada como "M resto").
-        mode = toupper(mode);                                       // Converte o caractere para maiúsculo para aceitar 'm' ou 'a'.
-        if (mode == 'M' || mode == 'A') {                            // Validação de Opção ('M' ou 'A')
-            *placement_mode = mode;                                         // Armazena o modo validado no endereço de memória apontado por *placement_mode.
+        clear_input_buffer();                             // Limpeza do buffer após a leitura do caractere, para o caso de entrada como "M resto".
+        mode = toupper(mode);                                       //converte o caractere para maiúsculo.
+        if (mode == 'M' || mode == 'A') {                            // validação de Opção ('M' ou 'A')
+            *placement_mode = mode;                                         //Armazena o modo validado no endereço de memória apontado por *placement_mode.
             break;} 
             else { 
             printf("Modo invalido. Digite 'M' para Manual ou 'A' para Automatico.\n");}
     } while (1);                                                            
-    return true;                                                           // Retorna sucesso na leitura de configurações.
+    return true;                                                           // retorna sucesso na leitura de configurações.
 }
 
-void io_get_player_names(char *p1_nickname, char *p2_nickname) {           //Solicitar e armazenar o nome dos dois jogadores.
+void io_get_player_names(char *p1_nickname, char *p2_nickname) {           //Solicitar e armazena o nome dos dois jogadores.
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     
     printf("\n===REGISTRO DE JOGADORES===\n");
     printf("Nome do Jogador 1 (no máximo 31 caracteres): ");                        
     fgets(p1_nickname, 32, stdin);
-    p1_nickname[strcspn(p1_nickname, "\n")] = '\0';                                 // Usamos strcspn para encontrar a posição do '\n' e substituí-lo por '\0' (terminador de string).
+    p1_nickname[strcspn(p1_nickname, "\n")] = '\0';                                 // Usamos strcspn para encontrar a posição do '\n' e substituí-lo por '\0'.
     printf("Nome do Jogador 2 (no máximo 31 caracteres): ");                           
     fgets(p2_nickname, 32, stdin);                 
     p2_nickname[strcspn(p2_nickname, "\n")] = '\0';
     printf("Nomes registrados!\n");
 }
 
-//Ler a coordenada do tiro, validar formato e limites do tabuleiro.
+//ler a coordenada do tiro, validar formato e limites do tabuleiro.
 bool io_get_shot_coord(int max_size, int *row, int *col) {
-    char input[10]; // Buffer para ler a coordenada (ex: A10, B5)
+    char input[10];                                // Buffer para ler a coordenada 
     int temp_row = -1, temp_col = -1;
     bool valid_input = false;
-    do {                        // Loop de validação, repete até obter uma coordenada válida nos limites do board.
+    do {                        //Loop de validação, repete até obter uma coordenada válida.
         printf("Digite coordenada do tiro (ex.: E5): ");
         if (fgets(input, sizeof(input), stdin) == NULL){            
             return false;
         }
         input[strcspn(input, "\n")] = '\0';                             
-        if (!io_converter_coord(input, &temp_row, &temp_col)) {               // Tenta converter a string (ex: "B5") para índices numéricos (temp_row, temp_col).
+        if (!io_converter_coord(input, &temp_row, &temp_col)) {               // tenta converter a string para índices numéricos (temp_row, temp_col).
             printf("Coordenada invalida. Formato incorreto (esperado LetraNumero, ex: A1).\n");
-            continue; // Tenta novamente.
+            continue;                                         // Tenta novamente.
         }
-        if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {               // Verifica se os índices convertidos estão dentro dos limites do tabuleiro.
+        if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {               // verifica se os índices convertidos estão dentro dos limites do tabuleiro.
             printf("Coordenada fora dos limites do tabuleiro (%c1 a %c%d).\n", 'A', 'A' + max_size - 1, max_size);
             continue;                    
         }
@@ -150,7 +146,7 @@ void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk)
     }
     // Tratamento para Acertos (HIT ou SUNK)
     else if (result == SHOT_HIT || result == SHOT_SUNK) {
-        // Verifica se afundou (pelo enum ou pela flag bool)
+        // Verifica se afundou, pelo enum ou pela flag bool.
         if (result == SHOT_SUNK || is_sunk) {
             printf("AFUNDOU %s!\n", ship_name);
         } else {
@@ -167,7 +163,7 @@ static void print_player_stats(const Player *p) {
     
     double accuracy = 0.0;
     
-    if (total_shots > 0) {                               // Cálculo da precisão
+    if (total_shots > 0) {                               // Calculo da precisão
         accuracy = ((double)hits / total_shots) * 100.0;
     }
     printf("Estatisticas de %s:\n", p->nickname);
@@ -177,15 +173,14 @@ static void print_player_stats(const Player *p) {
 //Exibir o vencedor e as estatísticas.
 void io_show_winner_stats(const Player *winner, const Player *loser) {
     printf("\n*** FIM DE JOGO ***\n");
-    printf("Vencedor: %s\n", winner->nickname);         // Exibe o vencedor
-    printf("\n--- Estatisticas do Vencedor ---\n");     // Imprime as estatísticas do Vencedor.
+    printf("Vencedor: %s\n", winner->nickname);                 // Exibe o vencedor
+    printf("\n--- Estatisticas do Vencedor ---\n");                  //Imprime as estatísticas do Vencedor.
     print_player_stats(winner);
-    printf("\n--- Estatisticas do Perdedor ---\n");     // Imprime as estatísticas do Perdedor.
+    printf("\n--- Estatisticas do Perdedor ---\n");             //imprime as estatísticas do Perdedor.
     print_player_stats(loser);
 }
 
 //Exibe a composição de frotas para os jogadores
-
 void io_show_fleet_rule() {
     printf("\n=== COMPOSICAO DA FROTA ===\n");
     printf("- 1 Porta-avioes (5 celulas)\n");

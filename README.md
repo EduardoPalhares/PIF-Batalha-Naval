@@ -79,9 +79,9 @@ Toda a memória alocada dinamicamente para os tabuleiros e frotas (via `board_cr
 * [x] Detecção de vitória e estatísticas finais (Precisão de tiro).
 
 ## Como Jogar 
-* [x] **Objetivo**
-* [x] objetivo do batalha naval é afundar toda a frota de navios do seu oponente antes que ele afunde a sua.
-* [x] **Jogabilidade**
+* [x]**Objetivo**
+* [x] O objetivo do batalha naval é afundar toda a frota de navios do seu oponente antes que ele afunde a sua.
+* [x]**Jogabilidade**
 * [x] O Jogo é disputado por dois jogadores
 * [x] Os jogadores, ou o próprio jogo, caso os jogadores tenham escolhido o modo automático, posicionam as peças no tabuleiro
 * [x] Os jogadores alteram em turnos disparando tiros em coordenadas (Por exemplo "H1")

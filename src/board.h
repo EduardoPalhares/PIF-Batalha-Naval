@@ -6,10 +6,10 @@
 #include <stdio.h>
 
 typedef enum{
-    CELL_WATER,                       // 0: Célula vazia (Água)
-    CELL_SHIP,                        // 1: Célula ocupada por um navio (não atingido)
-    CELL_HIT,                         // 2: Célula que tinha navio e foi atingida (Acerto)
-    CELL_MISS                         // 3: Célula que era água e foi atingida (Água)
+    CELL_WATER,                       //  Célula vazia (Água)
+    CELL_SHIP,                        //  Célula ocupada por um navio (não atingido)
+    CELL_HIT,                         // Célula que tinha navio e foi atingida (Acerto)
+    CELL_MISS                         // Célula que era água e foi atingida (Água)
 }CellState;
 
 // Representa uma única posição do tabuleiro (o menor elemento estrutural).

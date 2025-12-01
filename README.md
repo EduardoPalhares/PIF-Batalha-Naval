@@ -79,13 +79,13 @@ Toda a memória alocada dinamicamente para os tabuleiros e frotas (via `board_cr
 * [x] Detecção de vitória e estatísticas finais (Precisão de tiro).
 
 ## Como Jogar 
-- **Objetivo**
-O objetivo do batalha naval é afundar toda a frota de navios do seu oponente antes que ele afunde a sua.
-- **Jogabilidade**
-O Jogo é disputado por dois jogadores
-Os jogadores, ou o próprio jogo, caso os jogadores tenham escolhido o modo automático, posicionam as peças no tabuleiro
-Os jogadores alteram em turnos disparando tiros em coordenadas (Por exemplo "H1")
-Caso um jogador acerte o navio do adversário o jogo irá notificar "Acertou o Navio X"
-Caso tenha afundado, tenha finalizado as peças determinadas de uma embarcação, aparecerá "Afundou o Navio X"
-Caso não acerte nenhum navio, o jogo mostrará "AGUA"
-O Jogo termina quando um dos adversários afundar todas as embacações do rival
+* [x]**Objetivo**
+* [x] objetivo do batalha naval é afundar toda a frota de navios do seu oponente antes que ele afunde a sua.
+* [x]**Jogabilidade**
+* [x]O Jogo é disputado por dois jogadores
+* [x]Os jogadores, ou o próprio jogo, caso os jogadores tenham escolhido o modo automático, posicionam as peças no tabuleiro
+* [x]Os jogadores alteram em turnos disparando tiros em coordenadas (Por exemplo "H1")
+* [x]Caso um jogador acerte o navio do adversário o jogo irá notificar "Acertou o Navio X"
+* [x]Caso tenha afundado, tenha finalizado as peças determinadas de uma embarcação, aparecerá "Afundou o Navio X"
+* [x]Caso não acerte nenhum navio, o jogo mostrará "AGUA"
+* [x]O Jogo termina quando um dos adversários afundar todas as embacações do rival

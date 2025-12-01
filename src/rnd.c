@@ -1,5 +1,4 @@
-//Geração de números aleatórios (para modo automático)
-// Implementação das funções de geração de números aleatórios.
+//Geração de números aleatórios
 
 #include <stdlib.h>
 #include <time.h>
@@ -17,16 +16,14 @@ void rnd_init() {
 
 // Gerar um número inteiro aleatório dentro de um intervalo definido.
 int rnd_get_int(int min, int max) {
-    if (min > max) {                           // Garante que o mínimo não seja maior que o máximo.
-        return min;                            //Podemos retornar o mínimo ou, idealmente, tratar como erro. Neste caso, retornamos 'min'.
+    if (min > max) {                   // Garante que o mínimo não seja maior que o máximo.
+        return min;                            
     }
 
-    // 2. Cálculo do Tamanho do Intervalo (Range):
+
     // O intervalo de números possíveis é (max - min) + 1.
     int range = max - min + 1;
     
-    // 3. Geração do Número Aleatório:
-    // A fórmula para gerar um número no intervalo [min, max] é: (rand() % range) + min. (rand() % range) garante um número no intervalo [0, range - 1].
-    // Ex: [0, 5] se range = 6. Adicionar 'min' desloca o intervalo para [min, max]. Ex: (rand() % 6) + 5 -> gera números de 5 a 10.
+    // Geração do Número Aleatório:
     return (rand() % range) + min;
 }

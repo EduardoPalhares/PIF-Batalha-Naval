@@ -1,21 +1,20 @@
-//Frota de navios (definição, posicionamento, status)
+//Definição e controle dos navios
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "fleet.h"
 
-//Função privada usada para criação de frota padrão(Função privada)
+//Auxilia fleet_create()
 static void fleet_add_ship(Fleet *f, const char *name, int length) {
     //  Aumenta a contagem de navios
     f->count++;
 
-    //  Redimensiona o array de navios para caber mais um
-    // Se f->ships for NULL (primeira vez), o realloc funciona como malloc.
+    // Aumenta mais um no array de navios
     Ship *temp = (Ship *) realloc(f->ships, f->count * sizeof(Ship));
 
+    //Verificação
     if (temp == NULL) {
         printf("ERRO FATAL: Falha ao realocar memoria para a frota.\n");
-        // Em caso de falha, liberamos o que já existia para evitar leak
         free(f->ships); 
         exit(1);
     }
@@ -35,7 +34,7 @@ Fleet fleet_create() {
     f.count = 0;
     f.ships = NULL; 
 
-    // Adiciona os navios um a um dinamicamente chamando a NOVA função
+    // Adiciona os navios um a um dinamicamente
     
     // 1 Porta-aviões (5)
     fleet_add_ship(&f, "Porta-avioes", 5);
@@ -63,15 +62,15 @@ void fleet_destroy(Fleet *fleet) {
     }
 }
 
-//Verifica se é possível colocar o navio no board(sem gravar)
-//Retorna 1 se for possível,0 se inválido (fora do mapa ou colisão)
+
+//Verifica se o navio cabe
 int fleet_check_placement(Board *board, Ship *ship, int row, int col, Orientation orient) {
-    // Verificação limites do tabuleiro
+    // Verificação limites do board
     if (orient == ORIENT_H) {
-        //Se for horizontal, col + tamanho deve ser <= total de colunas
+
         if (col + ship->length > board->cols) return 0; // Sai do mapa à direita
     } else {
-        //Se for vertical, row + tamanho deve ser <= total de linhas
+
         if (row + ship->length > board->rows) return 0; // Sai do mapa para baixo
     }
     //Verificar Colisão (Se já tem navio no caminho)
@@ -105,7 +104,7 @@ void fleet_place_ship(Board *board, Ship *ship, int ship_id, int row, int col, O
         
         // Atualiza o estado da célula
         cell->state = CELL_SHIP;
-        cell->ship_id = ship_id;  // Ex: 'A' - 'A' = 0; 'B' - 'A' = 1.d = ship_id;
+        cell->ship_id = ship_id;  
     }
 
     ship->placed = 1;      // Marca o navio como posicionado na struct dele

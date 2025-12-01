@@ -1,4 +1,4 @@
-// Entrada e saída de dados (menus, leitura de coordenadas)
+// Entrada e saída de dados (CLI)
 #include <stdio.h>
 #include <stdbool.h>
 #include <ctype.h>
@@ -95,7 +95,7 @@ bool io_get_settings(int *board_size, char *placement_mode) {
     return true;                                                           // Retorna sucesso na leitura de configurações.
 }
 
-void io_get_player_names(char *p1_nickname, char *p2_nickname) {                            //Solicitar e armazenar o nome dos dois jogadores.
+void io_get_player_names(char *p1_nickname, char *p2_nickname) {           //Solicitar e armazenar o nome dos dois jogadores.
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     
@@ -114,23 +114,23 @@ bool io_get_shot_coord(int max_size, int *row, int *col) {
     char input[10]; // Buffer para ler a coordenada (ex: A10, B5)
     int temp_row = -1, temp_col = -1;
     bool valid_input = false;
-    do {                        // Loop de validação, repete até obter uma coordenada válida nos limites do tabuleiro.
+    do {                        // Loop de validação, repete até obter uma coordenada válida nos limites do board.
         printf("Digite coordenada do tiro (ex.: E5): ");
         if (fgets(input, sizeof(input), stdin) == NULL){            
             return false;
         }
         input[strcspn(input, "\n")] = '\0';                             
-        if (!io_converter_coord(input, &temp_row, &temp_col)) {                      // Tenta converter a string (ex: "B5") para índices numéricos (temp_row, temp_col).
+        if (!io_converter_coord(input, &temp_row, &temp_col)) {               // Tenta converter a string (ex: "B5") para índices numéricos (temp_row, temp_col).
             printf("Coordenada invalida. Formato incorreto (esperado LetraNumero, ex: A1).\n");
             continue; // Tenta novamente.
         }
-        if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {                    // Verifica se os índices convertidos estão dentro dos limites do tabuleiro.
+        if (temp_row < 0 || temp_row >= max_size || temp_col < 0 || temp_col >= max_size) {               // Verifica se os índices convertidos estão dentro dos limites do tabuleiro.
             printf("Coordenada fora dos limites do tabuleiro (%c1 a %c%d).\n", 'A', 'A' + max_size - 1, max_size);
             continue;                    
         }
-        valid_input = true;                                        // Se chegou até aqui, a coordenada é válida.
+        valid_input = true;              // Coordenada válida.
     } while (!valid_input);
-    *row = temp_row;                            // Armazena os índices validados nos ponteiros de retorno.
+    *row = temp_row;                  // Armazena os índices validados nos ponteiros de retorno.
     *col = temp_col;
     return true;
 }
@@ -160,14 +160,14 @@ void io_show_shot_result(ShotResult result, const char *ship_name, bool is_sunk)
 }
 
 
-//Calcula a precisão e imprime o bloco de estatísticas para um jogador.
+//Calcula a precisão e imprime o bloco de estatísticas para um jogador
 static void print_player_stats(const Player *p) {
     int total_shots = p->total_shots;    
     int hits = p->total_hits;     
     
     double accuracy = 0.0;
     
-    if (total_shots > 0) {                                             // Cálculo da precisão: (acertos / tiros) * 100.0. Não requer math.h.
+    if (total_shots > 0) {                               // Cálculo da precisão
         accuracy = ((double)hits / total_shots) * 100.0;
     }
     printf("Estatisticas de %s:\n", p->nickname);
@@ -177,10 +177,10 @@ static void print_player_stats(const Player *p) {
 //Exibir o vencedor e as estatísticas.
 void io_show_winner_stats(const Player *winner, const Player *loser) {
     printf("\n*** FIM DE JOGO ***\n");
-    printf("Vencedor: %s\n", winner->nickname);                   // Exibe o vencedor, acessando diretamente o campo 'nickname'.
-    printf("\n--- Estatisticas do Vencedor ---\n");                         // Imprime as estatísticas do Vencedor.
+    printf("Vencedor: %s\n", winner->nickname);         // Exibe o vencedor
+    printf("\n--- Estatisticas do Vencedor ---\n");     // Imprime as estatísticas do Vencedor.
     print_player_stats(winner);
-    printf("\n--- Estatisticas do Perdedor ---\n");                             // Imprime as estatísticas do Perdedor.
+    printf("\n--- Estatisticas do Perdedor ---\n");     // Imprime as estatísticas do Perdedor.
     print_player_stats(loser);
 }
 

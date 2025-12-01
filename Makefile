@@ -1,19 +1,19 @@
 
 #   Makefile - Batalha Naval (PIF 2025.2)
 
-# 1. Configurações do Compilador
+# Configurações do Compilador
 CC = gcc
 # Flags obrigatórias para garantir "Qualidade de Código" (sem warnings)
 CFLAGS = -Wall -Wextra -std=c99 -g
 
-# 2. Estrutura de Pastas
+#  Estrutura de Pastas
 SRC_DIR = src
 OBJ_DIR = obj
 
-# 3. Nome do Executável Final
+#  Nome do Executável Final
 EXEC = batalha_naval
 
-# 4. Lista de Arquivos
+#  Lista de Arquivos
 # Pega todos os .c dentro da pasta src/ (main.c, board.c, fleet.c, io.c, rnd.c, game.c)
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
 # Cria a lista de objetos equivalentes na pasta obj/

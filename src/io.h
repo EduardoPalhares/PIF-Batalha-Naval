@@ -1,4 +1,4 @@
-// Entrada e saída de dados (menus, leitura de coordenadas)
+// Entrada e saída de dados (CLI)
 
 #ifndef IO_H
 #define IO_H

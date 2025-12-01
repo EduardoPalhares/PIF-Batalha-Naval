@@ -12,22 +12,22 @@
 Game game_init(int rows, int cols) {
     Game g;
     // Configuração do Jogador 1 
-    // Cria o tabuleiro dos navios dele
     g.p1.board = board_create(rows, cols);
-    g.p1.shots = board_create(rows, cols);        // cria o tabuleiro de tiros
-    g.p1.fleet = fleet_create();                // cria a frota padrão
+    g.p1.shots = board_create(rows, cols);  // Cria o board de tiros
+    g.p1.fleet = fleet_create();            // Cria a frota padrão
 
-    strcpy(g.p1.nickname, "Jogador 1");                //define um nome padrão
+    strcpy(g.p1.nickname, "Jogador 1");     //Define um nome padrão
     g.p1.total_shots = 0;
     g.p1.total_hits = 0;
-    g.p2.board = board_create(rows, cols);                        //  Configuração do Jogador 2 
+    //  Configuração do Jogador 2 
+    g.p2.board = board_create(rows, cols);  
     g.p2.shots = board_create(rows, cols);
     g.p2.fleet = fleet_create();
     strcpy(g.p2.nickname, "Jogador 2");
     g.p2.total_shots = 0; 
     g.p2.total_hits = 0;  
-    //Configurações Iniciais da Partida
-    g.current_player = 0;                                // Jogador 1 começa
+    //Configurações Iniciais da partida
+    g.current_player = 0;     //Começa com jogador 1                          
     g.game_over = 0;     
 
     return g;
@@ -35,6 +35,7 @@ Game game_init(int rows, int cols) {
 
 // Limpa a memória
 void game_destroy(Game *game) {
+    //Destrói board e frotas do p1 e p2
     board_destroy(&game->p1.board);
     board_destroy(&game->p1.shots);
     fleet_destroy(&game->p1.fleet);
@@ -45,19 +46,19 @@ void game_destroy(Game *game) {
 
 // Verifica se um navio afundou
 int game_check_sunk_ship(Ship *ship) {
-    if (ship->hits >= ship->length) {                                  // Se o número de acertos for igual ou maior que o tamanho, afundou.
-        return 1;                                                   // Afundou
+    if (ship->hits >= ship->length) {  //Acertos >=tamanho
+        return 1;// Afundou
     }
-    return 0;                                                       // Ainda vivo
+    return 0; // Ainda vivo
 }
 
-// Atualizar o estado das células e a vida do navio após um tiro válido.
+// Atualiza o estado das células e a vida do navio após um tiro válido
 static ShotResult game_check_hit_or_miss(Player *enemy, Cell *shot_c, Cell *real_c) {
     if (real_c->state == CELL_SHIP) {
-        shot_c->state = CELL_HIT;                                    // Marca no visual
-        shot_c->ship_id = real_c->ship_id;                                       // Temos que copiar o ID do navio para o tabuleiro de tiros (visual),
+        shot_c->state = CELL_HIT;        // Marca no visual
+        shot_c->ship_id = real_c->ship_id;   //Copia o ID do navio para o board de tiros 
 
-        real_c->state = CELL_HIT;                        // Marca dano real
+        real_c->state = CELL_HIT;   // Marca dano real
 
         int ship_id = real_c->ship_id;
         if (ship_id >= 0 && ship_id < enemy->fleet.count) {
@@ -73,43 +74,42 @@ static ShotResult game_check_hit_or_miss(Player *enemy, Cell *shot_c, Cell *real
     }
 }
 
-//Função para processamento de tiro 
-//Recebe o jogo e as coordenadas e retorna o resultado (EX:SHOT_HIT)
+//Processamento de tiro
 ShotResult game_handle_shot(Game *game, int row, int col) {
     // Identifica quem é o atirador e quem é o alvo
     Player *shooter = (game->current_player == 0) ? &game->p1 : &game->p2;
     Player *enemy   = (game->current_player == 0) ? &game->p2 : &game->p1;
 
-    Cell *shot_c = board_get_cell(&shooter->shots, row, col);                    // Onde eu vejo/marco
-    Cell *real_c = board_get_cell(&enemy->board, row, col);                        // O que existe de verdade
+    Cell *shot_c = board_get_cell(&shooter->shots, row, col);          // Onde eu vejo/marco
+    Cell *real_c = board_get_cell(&enemy->board, row, col);            // O que existe de verdade
 
     // Validações de Regra (Fluxos Alternativos)
-    if (!shot_c || !real_c) return SHOT_INVALID;                          //Coordeanda inválida, fora do mapa
-    if (shot_c->state != CELL_WATER) return SHOT_REPEATED;                        //Coordenada repetida
+    if (!shot_c || !real_c) return SHOT_INVALID;           //Coordeanda inválida
+    if (shot_c->state != CELL_WATER) return SHOT_REPEATED; //Coordenada repetida
 
-    shooter->total_shots++;                                      // Contabiliza o tiro
+    shooter->total_shots++;         // Contabiliza o tiro
     ShotResult res = game_check_hit_or_miss(enemy, shot_c, real_c);
     if (res == SHOT_HIT || res == SHOT_SUNK) {
-        shooter->total_hits++;                                // Contabiliza o acerto
+        shooter->total_hits++;                   // Contabiliza o acerto
     }
 
     //Passando nas validações, chama a lógica de acerto/erro
     return res;
 }
 
-// Verifica se o jogo acabou. Retorna 1 (Vitória/Fim) ou 0 (Continua).
-int game_check_win_condition(Game *game) {
-    // Define quem é o inimigo (quem está levando os tiros). Se o jogador atual é o P1 (0), o inimigo é o P2.
+// Verifica se o jogo acabou,1 (Vitória/Fim) ou 0 (Continua).
+int game_check_win(Game *game) {
+    // Define quem é o inimigo (quem está levando os tiros)
     Player *enemy = (game->current_player == 0) ? &game->p2 : &game->p1;
 
     // Verifica a frota do inimigo navio por navio
     for (int i = 0; i < enemy->fleet.count; i++) {
         Ship *s = &enemy->fleet.ships[i];
-        if (!game_check_sunk_ship(s)) {                                   // Se encontrar um navio que não afundou, o jogo continua.
+        if (!game_check_sunk_ship(s)) {              // Se tiver um navio que não afundou, o jogo continua.
             return 0; 
         }
     }
-    game->game_over = 1;                      // Atualiza a flag de estado do jogo, fim de jogo.
+    game->game_over = 1;                      // fim de jogo.
     return 1;                                 // Vitória decretada
 }
 
@@ -126,13 +126,13 @@ void game_place_ships_auto(Player *p, int board_size) {
             
             if (fleet_check_placement(&p->board, s, r, c, o)) {
                 fleet_place_ship(&p->board, s, i, r, c, o);
-                break;                                //Sucesso, vai para o próximo navio
+                break;                                //Sucesso, vai indo de navio a navio
             }
         }
     }
     printf("Todos os navios de %s foram posicionados.\n", p->nickname);
 }
-// Pergunta orientação ao usuário (H/V)
+// Pergunta orientação ao usuário H ou V
 static Orientation ask_orientation() {
     char input[100];                          
     char c;
@@ -192,7 +192,6 @@ static void process_turn(Game *game, Player *current, Player *enemy) {
             printf("Tiro invalido ou repetido. Tente de novo.\n");
             continue;
         }
-        
         // Exibe resultado
         const char *s_name = "Navio";
         bool sunk = (res == SHOT_SUNK);
@@ -209,7 +208,7 @@ static void process_turn(Game *game, Player *current, Player *enemy) {
 // Executa o loop principal de turnos do jogo.
 void game_loop(Game *game, char placement_mode) {
     if (placement_mode == 'M') {
-        game_place_ships_manual(&game->p1, game->p1.board.rows);                  //Fase de posicionamento
+        game_place_ships_manual(&game->p1, game->p1.board.rows);         //Fase de posicionamento
         game_place_ships_manual(&game->p2, game->p2.board.rows);
     } else {
         game_place_ships_auto(&game->p1, game->p1.board.rows);
@@ -222,8 +221,8 @@ void game_loop(Game *game, char placement_mode) {
         Player *curr = (game->current_player == 0) ? &game->p1 : &game->p2;
         Player *enemy = (game->current_player == 0) ? &game->p2 : &game->p1;
         process_turn(game, curr, enemy);
-        if (game_check_win_condition(game)) break;
-        game->current_player = 1 - game->current_player;                                    //Alterna 0 e 1
+        if (game_check_win(game)) break;
+        game->current_player = 1 - game->current_player;                  //Alterna 0 e 1
     }                                                
     // Identifica o vencedor e o perdedor
     Player *winner = (game->current_player == 0) ? &game->p1 : &game->p2;

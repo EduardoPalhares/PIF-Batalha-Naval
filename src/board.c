@@ -1,97 +1,99 @@
-//Tabuleiro (onde ficam as células e os navios)
+//Estrutura do tabuleiro
 
 #include <stdio.h>
 #include<stdlib.h>
 #include "board.h"
 
-//Alocar memória para criação de tabuleiro
+//Alocar memória para criação do board
 Board board_create(int rows, int cols){
-    Board new_board;                                   //Declaração da variável local que armazenará o novo tabuleiro.
+    Board board;    
 
-    // Armazena as dimensões do tabuleiro na struct.
-    new_board.rows=rows;
-    new_board.cols=cols;
+    // Linhas e colunas do board
+    board.rows=rows;
+    board.cols=cols;
 
-    new_board.cells=(Cell *) malloc(rows *cols * sizeof (Cell));               //Aloca a memória para o total de quadradinhos
+    board.cells=(Cell *) malloc(rows *cols * sizeof (Cell));  //Aloca as células do board
 
-    if (new_board.cells==NULL){
+    if (board.cells==NULL){
         printf("Erro ao alocar a memória para o tabuleiro.\n");
         exit (1);
     }
-
-    for (int i=0;i< rows * cols;i++){                 // Percorre todas as células alocadas (do índice 0 até o total de células - 1).
-        new_board.cells[i].state=CELL_WATER;          // Inicializa o estado da célula como água (~).
-        new_board.cells[i].ship_id=-1;                // -1 indica que não há navio
+    //Inicia como água e com -1(não há navio)
+    for (int i=0;i< rows * cols;i++){                 
+        board.cells[i].state=CELL_WATER;          
+        board.cells[i].ship_id=-1;                
     }
 
-    return new_board;
+    return board;
 }
-//Função para liberar memória após uso
+//Liberar memória alocada para o tabuleiro
 void board_destroy(Board *board){
     if (board -> cells !=NULL){
         free(board->cells);
-        board->cells=NULL;                             //anulação do ponteiro após liberar
+        board->cells=NULL;        
     }
 }
 
-// Retorna um ponteiro para a célula na posição (row, col) ou NULL se inválido
+// Retorna um ponteiro para a célula na posição ou NULL se inválido
 Cell* board_get_cell(Board *board, int row, int col){
-    if (row < 0 || row >= board->rows || col<0 || col>= board->cols){        // Garante que 'row' e 'col' estão dentro das dimensões válidas do tabuleiro.
-        return NULL; //Coordenada Inválida
+    //Valida limites
+    if (row < 0 || row >= board->rows || col<0 || col>= board->cols){  
+        return NULL;      
     }
     
-    int index= (row* board->cols) + col;            //calculo de indice
+    int index= (row* board->cols) + col; //Cálculo de indice
 
-    return &board->cells[index];                   //retorna o endereço daquela celula específica
+    return &board->cells[index];  //Retorna da celula específica
 }
 
-//Símbolos personalizados
-static char get_cell_symbol(Cell *cell, int show_ships) {
-    // Se for Água ou Erro (Tiro na água), símbolos padrão
-    if (cell->state == CELL_WATER) return '~';
-    if (cell->state == CELL_MISS)  return '.';
-    // Se for Navio (Escondido ou Atingido)
-    char letra = '?';
-    switch (cell->ship_id) {
-        case 0: letra = 'P'; break; // Porta-aviões
-        case 1: letra = 'E'; break; // Encouraçado
-        case 2: 
-        case 3: letra = 'C'; break; // Cruzador
-        case 4: 
-        case 5: letra = 'D'; break; // Destroyer
-        default: letra = 'S'; break; // Genérico (segurança)
+//Símbolos dos ships
+char get_ship_symbol(int id) {
+    switch(id) {
+        case 0: return 'P'; // Porta-avioes
+        case 1: return 'E'; // Encouracado
+        case 2: return 'C'; // Cruzador
+        case 3: return 'C'; // Cruzador
+        default: return 'D'; // Destroyer
     }
-    // Lógica de Exibição
-    if (cell->state == CELL_HIT) {
-        return letra; // Se acertou, mostra a letra do navio (P, E, C, D) em vez de X
-    } 
-    if (cell->state == CELL_SHIP) {
-        // Se o navio está intacto:mostra a letra se for o meu tabuleiro (show_ships=1),
-        // esconde como água se for o inimigo (show_ships=0)
-        return (show_ships) ? letra : '~';
-    }
-    return '?';
 }
 
-// Exibe o estado atual do tabuleiro no terminal
+//Símbolo da célula
+char get_symbol(Cell *c, int show_ships) {
+    if (c->state == CELL_WATER) return '~';
+    if (c->state == CELL_MISS) return '.';
+    
+    
+    if (c->state == CELL_HIT) {
+        return get_ship_symbol(c->ship_id);
+    }
+    
+    if (c->state == CELL_SHIP) {
+        if (show_ships == 1) return get_ship_symbol(c->ship_id);
+        else return '~'; 
+    }
+    
+    return '?'; // Erro
+}
+
+// Exibe o estado atual do board no terminal
 void board_display(Board *board, int show_ships) {
-    // Cabeçalho das Colunas
+    // Colunas
     printf("   "); 
     for (int j = 0; j < board->cols; j++) printf("%c ", 'A' + j);
     printf("\n");
-    //Linha Divisória Horizontal (---)
+    
     printf("   "); 
     for (int j = 0; j < board->cols; j++) {
-        printf("--"); // Dois traços para cada coluna
+        printf("--"); 
     }
     printf("\n");
-    // Linhas do Tabuleiro
+    // Linhas 
     for (int i = 0; i < board->rows; i++) {
-        printf("%2d|", i + 1); // Número da linha + Barra Vertical (|)
+        printf("%2d|", i + 1); 
         for (int j = 0; j < board->cols; j++) {
             Cell *c = board_get_cell(board, i, j);
-            // Agora passamos o ponteiro 'c' inteiro
-            printf("%c ", get_cell_symbol(c, show_ships));
+            //Mostra a letra de acordo com o acerto
+            printf("%c ", get_symbol(c, show_ships));
         }
         printf("\n");
     }

@@ -5,58 +5,55 @@
 #include "board.h"
 #include "fleet.h"
 
+//Resultado do tiro
 typedef enum {
-    SHOT_MISS,      // Errou (Água)
-    SHOT_HIT,       // Acertou uma parte do navio
-    SHOT_SUNK,      // Afundou o navio todo!
-    SHOT_REPEATED,  // Já tinha atirado aqui antes
-    SHOT_INVALID    // Coordenada inválida
+    SHOT_MISS,      // Água
+    SHOT_HIT,       // Acertou 
+    SHOT_SUNK,      // Afundou 
+    SHOT_REPEATED,  // Repetido
+    SHOT_INVALID    // Inválido
 } ShotResult;
 
-// Representa um jogador individual e seu estado no jogo.
+// Estrutura do Jogador
 typedef struct {
-    Board board;                          // O tabuleiro onde estão posicionados OS SEUS navios
-    Board shots;                          // Tabuleiro de tiros (visto do inimigo)
-    Fleet fleet;                          // A frota de navios que pertence a este jogador
-    char nickname[32];                    // Apelido ou nome do jogador
-    int total_shots;                      // Total de tiros disparados
-    int total_hits;                       // Total de tiros que acertaram (X)
+    Board board;        // Board com os navios
+    Board shots;        // Board de tiros
+    Fleet fleet;        // Frota do jogador
+    char nickname[32];  // Apelido ou nome do jogador
+    int total_shots;    // Total de tiros disparados
+    int total_hits;     // Total de tiros acertados
 }Player;
 
-// Representa o estado geral e o controle do jogo
+// Estrutura do jogo
 typedef struct{
-    Player p1;                            // Dados completos do Jogador 1
-    Player p2;                            // Dados completos do Jogador 2
-    int current_player;                   // Variável de controle que indica de quem é o turno, pode usar 1 para P1 e 2 para P2
-    int game_over;                        // Flag (0 ou 1) que indica se o jogo terminou.O jogo termina quando a frota de um jogador é afundada
+    Player p1;          // Jogador 1
+    Player p2;          // Jogador 2
+    int current_player; // Turno de jogar
+    int game_over;      // Se acabou
 }Game;
 
-//inicializa o jogo: cria tabuleiros (com tamanho rows x cols) e frotas para ambos
+//Incia as estruturas do Board
 Game game_init(int rows,int cols);
 
-//Libera toda memŕoa alocada no jogo (tabuleiros e frotas)
+//Libera toda memŕoa alocada no jogo
 void game_destroy(Game *game);
 
-//Função para processamento de tiro 
-//Recebe o jogo e as coordenadas e retorna o resultado (EX:SHOT_HIT)
+//Processa um tiro
 ShotResult game_handle_shot(Game *game, int row, int col);
 
-// Verifica se um navio específico afundou (hits >= length)
-// Retorna 1 (True) se afundou, 0 (False) se ainda está vivo
+// Verifica se um navio afundou 
 int game_check_sunk_ship(Ship *ship);
 
-// Verifica se o jogo acabou (se todos os navios do oponente afundaram).
-// Retorna 1 (Vitória/Fim) ou 0 (Continua).
-// Também atualiza a flag game->game_over.
-int game_check_win_condition(Game *game);
+//Verifica vitória
+int game_check_win(Game *game);
 
-// Coloca navios automaticamente (lógica de pos. aleatório)
+//Coloca navios automaticamente (lógica de pos. aleatório)
 void game_place_ships_auto(Player *p, int board_size); 
 
-// Coloca navios manualmente (lógica de I/O)
+//Coloca navios manualmente (lógica de I/O)
 void game_place_ships_manual(Player *p, int board_size);
 
-// Executa o loop principal de turnos do jogo.
+//Executa o loop principal do jogo
 void game_loop(Game *game, char placement_mode);
 
-#endif //GAME_H
+#endif 

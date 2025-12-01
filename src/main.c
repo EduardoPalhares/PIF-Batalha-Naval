@@ -7,7 +7,7 @@
 #include "io.h"
 #include "rnd.h"
 
-// Função auxiliar que gerencia uma partida completa
+// Gerencia a partida completa
 void run_game_session() {
     int size = 10;
     char mode = 'A'; // Padrão
@@ -20,13 +20,12 @@ void run_game_session() {
     io_show_fleet_rule();
 
     printf("\n=== PREPARANDO O TABULEIRO [%dx%d] ===\n", size, size);
-    //  Inicialização do Jogo
+    // Inicialização do Jogo
     Game jogo = game_init(size, size);
     strcpy(jogo.p1.nickname, p1_name);
     strcpy(jogo.p2.nickname, p2_name);
 
     // Inicia o Loop Principal (Posicionamento + Batalha)
-    // Agora chamamos a função real que está no game.c!
     game_loop(&jogo, mode);
 
     // Encerramento e Limpeza
@@ -44,7 +43,7 @@ int main() {
 
         switch (opcao) {
             case 1: 
-                run_game_session(); // Começa o jogo!
+                run_game_session(); // Começa o jogo
                 break;
             case 2: 
                 printf("\n[Info] As configuracoes sao definidas ao iniciar um Novo Jogo.\n");

@@ -11,7 +11,7 @@ Este é o projeto final da disciplina de **Programação Imperativa e Funcional 
 O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendidos em sala de aula, demonstrando o domínio de:
 * **Structs e Enums** para modelagem de dados.
 * **Ponteiros e Passagem por Referência**.
-* **Alocação Dinâmica de Memória** (`malloc` e `free`).
+* **Alocação Dinâmica de Memória** (`malloc`,'realloc' e `free`).
 * **Modularização** e organização de código.
 
 ##  Equipe
@@ -38,7 +38,7 @@ O projeto utiliza um `Makefile` para automatizar o processo de compilação. Cer
     ./batalha_naval
     ```
 
-3.  **Limpar arquivos compilados (Opcional):**
+3.  **Limpar arquivos compilados :**
     Para remover os arquivos `.o` e o executável gerado:
     ```bash
     make clean

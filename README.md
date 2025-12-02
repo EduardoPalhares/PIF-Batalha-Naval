@@ -11,7 +11,7 @@ Este é o projeto final da disciplina de **Programação Imperativa e Funcional 
 O objetivo principal é aplicar os conceitos fundamentais da linguagem C aprendidos em sala de aula, demonstrando o domínio de:
 * **Structs e Enums** para modelagem de dados.
 * **Ponteiros e Passagem por Referência**.
-* **Alocação Dinâmica de Memória** (`malloc`,'realloc' e `free`).
+* **Alocação Dinâmica de Memória** (`malloc`,`realloc` e `free`).
 * **Modularização** e organização de código.
 
 ##  Equipe
